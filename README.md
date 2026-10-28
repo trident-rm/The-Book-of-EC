@@ -1,6 +1,6 @@
 # The Book of EC
 
-面向 RoboMaster 新成员的嵌入式电控学习导航。项目用学习节点及其先修关系组织工程、编程、嵌入式、通信、控制和机器人实践知识。
+面向 RoboMaster 新成员的嵌入式电控学习导航。
 
 ## 本地开发
 
@@ -11,9 +11,9 @@ vp install
 vp run dev
 ```
 
-`vp` 从 `package.json` 的 `engines.node` 读取 Node.js 版本要求，从 `packageManager` 读取底层 pnpm 版本；`pnpm-lock.yaml` 继续锁定依赖。运行 `vp env current` 可查看实际版本及其来源。`pnpm-workspace.yaml` 关闭 pnpm 自行管理运行时和包管理器版本，统一交给 `vp` 选择。
+`vp` 从 `package.json` 的 `engines.node` 读取 Node.js 版本要求，从 `packageManager` 读取底层 pnpm 版本。`vp env current` 可查看实际版本及其来源。`pnpm-workspace.yaml` 关闭 pnpm 自行管理运行时和包管理器版本，统一交给 `vp` 选择。
 
-项目脚本使用 `vp run <script>` 执行，继续调用独立的 Oxfmt、Oxlint、`vue-tsc` 和 VitePress。
+项目脚本使用 `vp run <script>`（或缩写为 `vpr <script>`）执行，调用独立的 Oxfmt、Oxlint、`vue-tsc` 和 VitePress。
 
 常用指令：
 
@@ -39,8 +39,6 @@ vp run dev
 新增学习节点时，在 `src/nodes/<domain>/<slug>/` 创建 Markdown 页面和 `meta.ts`，再将 ID 及静态导入加入 `src/.vitepress/content/nodes.ts`。`parts` 必须按阅读顺序列出全部页面，首项为入口页；加入专题则更新 `topics.ts`。完整规则见[维护本书](src/contributing/index.md)。
 
 ## 持续集成与发布
-
-GitHub Actions 通过 `voidzero-dev/setup-vp` 安装固定版本的 Vite+、读取项目环境声明并缓存依赖，再使用 `vp install --frozen-lockfile` 安装依赖。
 
 每次向分支 push 时，CI 都会运行格式、lint、类型和构建检查。匹配 `v*.*.*` 的 tag push 也会触发检查，但 tag 必须严格符合 `v<MAJOR>.<MINOR>.<PATCH>`（例如 `v1.2.3`），否则 workflow 会失败；合法 tag 会在检查通过后部署 GitHub Pages，并创建 GitHub Release。
 
