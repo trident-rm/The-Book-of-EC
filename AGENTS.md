@@ -39,17 +39,3 @@ vp run build
 ```
 
 `vp run fmt` 会写入格式化结果；提交前必须检查这些改动。`vp run check` 包含格式检查、lint 和 Vue / TypeScript 类型检查，`vp run build` 会额外验证内容数据与内部链接。
-
-## Agent skills
-
-### Issue tracker
-
-Issues are tracked in this repository's GitHub Issues. See `docs/agents/issue-tracker.md`.
-
-### Triage labels
-
-Triage uses the five canonical labels with their default names. See `docs/agents/triage-labels.md`.
-
-### Domain docs
-
-This repository uses the single-context layout. See `docs/agents/domain.md`.
