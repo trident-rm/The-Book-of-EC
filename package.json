@@ -12,7 +12,7 @@
     "lint": "oxlint src --deny-warnings",
     "lint:fix": "oxlint src --fix",
     "typecheck": "vue-tsc --noEmit",
-    "check": "pnpm run fmt:check && pnpm run lint && pnpm run typecheck",
+    "check": "vp run fmt:check && vp run lint && vp run typecheck",
     "build": "vitepress build src",
     "preview": "vitepress preview src"
   },

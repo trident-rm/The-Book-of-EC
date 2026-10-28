@@ -6,7 +6,8 @@
 
 ## 开发约束
 
-- 使用 `pnpm` 管理依赖和运行脚本，不使用 npm 或 Yarn。
+- 使用全局 Vite+（`vp`）作为工具入口：安装依赖用 `vp install`，运行项目脚本用 `vp run <script>`；底层 pnpm 由 `package.json` 的 `packageManager` 选择。
+- 构建与检查继续使用项目独立的 VitePress、Oxfmt、Oxlint 和 `vue-tsc`，通过 `vp run` 调用现有脚本。
 - 修改前先阅读相关页面和 `src/.vitepress/content/` 中的数据定义，保持正文、节点元数据、专题和导航一致。
 - 学习节点位于 `src/nodes/<domain>/<slug>/`，元数据在同目录的 `meta.ts` 中声明。所有页面必须登记在 `parts` 中；首项是入口页，`path` 包含 `.md` 扩展名。
 - 节点私有组件和静态资源分别放在该节点的 `components/`、`assets/` 中；资源文件名使用小写 kebab-case。教学组件由使用它的 Markdown 显式导入，不得注册为全局主题组件。
@@ -32,12 +33,12 @@
 完成修改后依次运行：
 
 ```sh
-pnpm fmt
-pnpm check
-pnpm build
+vp run fmt
+vp run check
+vp run build
 ```
 
-`pnpm fmt` 会写入格式化结果；提交前必须检查这些改动。`pnpm check` 包含格式检查、lint 和 TypeScript 类型检查，`pnpm build` 会额外验证内容数据与内部链接。
+`vp run fmt` 会写入格式化结果；提交前必须检查这些改动。`vp run check` 包含格式检查、lint 和 Vue / TypeScript 类型检查，`vp run build` 会额外验证内容数据与内部链接。
 
 ## Agent skills
 

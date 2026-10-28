@@ -35,22 +35,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v6
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v7
+      - name: Set up Vite+
+        uses: voidzero-dev/setup-vp@v1.22.0
         with:
+          version: "1.4.0"
           node-version-file: package.json
-          cache: pnpm
+          run-install: false
+          cache: true
           cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: vp install --frozen-lockfile
 
       - name: Check
         if: github.event_name != 'workflow_dispatch'
-        run: pnpm check
+        run: vp run check
 
       - name: Configure Pages
         if: github.ref_type == 'tag' || github.event_name == 'workflow_dispatch'
@@ -60,7 +59,7 @@ jobs:
       - name: Build
         env:
           VITEPRESS_BASE_PATH: ${{ steps.pages.outputs.base_path }}
-        run: pnpm build
+        run: vp run build
 
       - name: Upload Pages artifact
         if: github.ref_type == 'tag' || github.event_name == 'workflow_dispatch'

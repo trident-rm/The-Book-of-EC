@@ -13,7 +13,7 @@ next: false
 3. 在 `nodes.ts` 中静态导入元数据并加入中央注册表。
 4. 按阅读顺序将全部页面加入 `parts`，入口页放在首项，`path` 包含 `.md` 扩展名。
 5. 如需进入专题，在 `topics.ts` 的 `members` 中加入节点 ID。
-6. 运行 `pnpm check` 和 `pnpm build`。
+6. 运行 `vp run fmt`、`vp run check` 和 `vp run build`，并检查格式化结果。
 
 ## 入口页建议
 
@@ -43,7 +43,7 @@ Markdown 显式导入教学组件。节点内组件使用相对路径，静态�
 
 `.vitepress/theme/` 只保存站点布局、全站导航、通用渲染能力等站点级组件和样式。表达某个学习内容的组件即使被多个页面使用，也不属于主题。图表等生成资源的源文件和产物放在所属节点的 `assets/`，通用生成工具放在 `scripts/`。
 
-修改 `src/nodes/**/assets/*.wavedrom.json5` 图表源文件后，运行 `pnpm diagrams:generate`。生成器会自动发现这些源文件，在相同目录写入同名 SVG；生成后应检查源文件和 SVG 的差异是否符合预期。
+修改 `src/nodes/**/assets/*.wavedrom.json5` 图表源文件后，运行 `vp run diagrams:generate`。生成器会自动发现这些源文件，在相同目录写入同名 SVG；生成后应检查源文件和 SVG 的差异是否符合预期。
 
 ## 站内链接
 
