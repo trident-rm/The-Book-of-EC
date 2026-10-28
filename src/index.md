@@ -9,9 +9,6 @@ hero:
     - theme: brand
       text: 打开学习图
       link: /map/
-    - theme: alt
-      text: 从问题开始
-      link: /problems/
 
 features:
   - title: 节点是正文
@@ -43,10 +40,6 @@ features:
   <VPLink href="/map/topics/engineering"><strong>工程与协作</strong><span>命令行、版本管理与远程协作。</span></VPLink>
   <VPLink href="/map/topics/embedded"><strong>电子与嵌入式</strong><span>电路、电平与 MCU 结构。</span></VPLink>
 </div>
-
-## 从问题进入
-
-遇到构建、上电、通信或控制问题时，先记录现象和观测，再从[问题排查](/problems/)定位相关节点。
 
 ::: info 本书的边界
 本站负责学习关系、概念边界、训练任务和验证方法，不替代教材、芯片手册或实际工程文档。

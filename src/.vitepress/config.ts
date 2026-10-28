@@ -48,7 +48,6 @@ export default defineConfig({
     nav: [
       { text: "首页", link: "/" },
       { text: "学习图", link: "/map/" },
-      { text: "问题排查", link: "/problems/" },
       { text: "参考资料", link: "/reference/" },
       { text: "维护本书", link: "/contributing/" }
     ],

@@ -18,18 +18,6 @@ export function createSidebar(): DefaultTheme.Sidebar {
         ]
       }
     ],
-    "/problems/": [
-      {
-        text: "问题排查",
-        items: [
-          { text: "排查入口", link: "/problems/" },
-          { text: "程序与构建", link: "/problems/software-build" },
-          { text: "硬件与上电", link: "/problems/hardware-bring-up" },
-          { text: "通信", link: "/problems/communication" },
-          { text: "控制与联调", link: "/problems/control-integration" }
-        ]
-      }
-    ],
     "/reference/": [
       {
         text: "参考资料",

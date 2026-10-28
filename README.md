@@ -43,7 +43,6 @@ pnpm dev
 src/
 ├── nodes/                 学习节点正文及其私有、共享资源
 ├── map/                   总学习图和专题入口
-├── problems/              按实际问题组织的排查入口
 ├── reference/             阅读方法、术语和检索词
 ├── contributing/          内容模型与维护说明
 └── .vitepress/
