@@ -18,11 +18,6 @@ next: false
 专题图从总图中选择一组相关节点，并以弱化节点补充直接的专题外先修。专题成员没有固定阅读顺序。
 
 <div class="capability-map">
-  <VPLink href="/map/topics/engineering"><strong>工程与协作</strong><span>命令行、版本管理和调试。</span></VPLink>
-  <VPLink href="/map/topics/programming"><strong>C/C++ 与程序运行</strong><span>构建、对象、指针与资源管理。</span></VPLink>
-  <VPLink href="/map/topics/embedded"><strong>电子与嵌入式</strong><span>板级约束、外设与并发。</span></VPLink>
-  <VPLink href="/map/topics/communication"><strong>通信</strong><span>串行总线、帧与协议。</span></VPLink>
-  <VPLink href="/map/topics/control"><strong>控制与机器人</strong><span>采样、反馈、PID 与估计。</span></VPLink>
-  <VPLink href="/map/topics/robotics"><strong>RoboMaster 实践</strong><span>板级启动与系统联调。</span></VPLink>
-  <VPLink href="/map/topics/project-practice"><strong>项目实践</strong><span>工程、编程与嵌入式综合任务。</span></VPLink>
+  <VPLink href="/map/topics/engineering"><strong>工程与协作</strong><span>命令行、版本管理与远程协作。</span></VPLink>
+  <VPLink href="/map/topics/embedded"><strong>电子与嵌入式</strong><span>电路、电平与 MCU 结构。</span></VPLink>
 </div>

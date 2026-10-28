@@ -7,6 +7,6 @@ next: false
 
 # 工程与协作
 
-命令行、版本管理和调试构成阅读、修改和验证现有工程的基本能力。
+命令行操作、Git 版本管理与远程仓库协作。
 
 <LearningGraph topic="engineering" />

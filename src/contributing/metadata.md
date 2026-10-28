@@ -10,7 +10,7 @@ next: false
 
 ## 节点 ID
 
-全部固定 ID 在 `nodes.ts` 的 `nodeIds` 中统一声明，例如 `embedded.gpio`，`NodeId` 从该数组推导。每个 `meta.ts` 必须声明自己的 `id`；关系目标和专题成员只能使用已有 `NodeId`。
+全部固定 ID 在 `nodes.ts` 的 `nodeIds` 中统一声明，例如 `embedded.mcu-structure`，`NodeId` 从该数组推导。每个 `meta.ts` 必须声明自己的 `id`；关系目标和专题成员只能使用已有 `NodeId`。
 
 ## 节点字段
 

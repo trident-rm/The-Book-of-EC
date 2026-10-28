@@ -7,6 +7,6 @@ next: false
 
 # 电子与嵌入式
 
-从板级电气约束进入 MCU 启动、外设、中断、数据通路与并发。
+理解供电、参考地和逻辑电平的约束，以及 MCU 的内核、编译目标与外设分工。
 
 <LearningGraph topic="embedded" />

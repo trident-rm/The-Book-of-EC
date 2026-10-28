@@ -1,31 +1,8 @@
-import communicationProtocolFraming from "#nodes/communication/protocol-framing/meta.ts"
-import communicationSerialBuses from "#nodes/communication/serial-buses/meta.ts"
-import controlEstimationActuation from "#nodes/control/estimation-actuation/meta.ts"
-import controlFeedback from "#nodes/control/feedback/meta.ts"
-import controlPid from "#nodes/control/pid/meta.ts"
-import controlSamplingModel from "#nodes/control/sampling-model/meta.ts"
 import embeddedCircuitBasics from "#nodes/embedded/circuit-basics/meta.ts"
-import embeddedClockReset from "#nodes/embedded/clock-reset/meta.ts"
-import embeddedDrivers from "#nodes/embedded/drivers/meta.ts"
-import embeddedGpio from "#nodes/embedded/gpio/meta.ts"
-import embeddedInterrupts from "#nodes/embedded/interrupts/meta.ts"
 import embeddedMcuStructure from "#nodes/embedded/mcu-structure/meta.ts"
-import embeddedRtos from "#nodes/embedded/rtos/meta.ts"
-import embeddedTimersDma from "#nodes/embedded/timers-dma/meta.ts"
-import engineeringDebugging from "#nodes/engineering/debugging/meta.ts"
 import engineeringGitBasics from "#nodes/engineering/git-basics/meta.ts"
 import engineeringGitRemote from "#nodes/engineering/git-remote/meta.ts"
 import engineeringShellBasics from "#nodes/engineering/shell-basics/meta.ts"
-import programmingCppResource from "#nodes/programming/cpp-resource/meta.ts"
-import programmingObjectLifetime from "#nodes/programming/object-lifetime/meta.ts"
-import programmingPointersArrays from "#nodes/programming/pointers-arrays/meta.ts"
-import programmingTranslationLinking from "#nodes/programming/translation-linking/meta.ts"
-import projectBatchUrlProbe from "#nodes/project/batch-url-probe/meta.ts"
-import projectCanMotorControl from "#nodes/project/can-motor-control/meta.ts"
-import projectPlatformBringUp from "#nodes/project/platform-bring-up/meta.ts"
-import projectRefereeSystem from "#nodes/project/referee-system/meta.ts"
-import roboticsBringUp from "#nodes/robotics/bring-up/meta.ts"
-import roboticsSystemIntegration from "#nodes/robotics/system-integration/meta.ts"
 import type { Concept, Level, Technology } from "./taxonomy.ts"
 
 /** 全部合法节点 ID。 */
@@ -33,31 +10,8 @@ export const nodeIds = [
   "engineering.shell-basics",
   "engineering.git-basics",
   "engineering.git-remote",
-  "engineering.debugging",
-  "programming.translation-linking",
-  "programming.object-lifetime",
-  "programming.pointers-arrays",
-  "programming.cpp-resource",
   "embedded.circuit-basics",
-  "embedded.mcu-structure",
-  "embedded.clock-reset",
-  "embedded.gpio",
-  "embedded.interrupts",
-  "embedded.timers-dma",
-  "embedded.drivers",
-  "embedded.rtos",
-  "communication.serial-buses",
-  "communication.protocol-framing",
-  "control.sampling-model",
-  "control.feedback",
-  "control.pid",
-  "control.estimation-actuation",
-  "project.batch-url-probe",
-  "project.platform-bring-up",
-  "project.can-motor-control",
-  "project.referee-system",
-  "robotics.bring-up",
-  "robotics.system-integration"
+  "embedded.mcu-structure"
 ] as const
 
 /** 合法节点 ID。 */
@@ -109,31 +63,8 @@ export const nodes = {
   [engineeringShellBasics.id]: engineeringShellBasics,
   [engineeringGitBasics.id]: engineeringGitBasics,
   [engineeringGitRemote.id]: engineeringGitRemote,
-  [engineeringDebugging.id]: engineeringDebugging,
-  [programmingTranslationLinking.id]: programmingTranslationLinking,
-  [programmingObjectLifetime.id]: programmingObjectLifetime,
-  [programmingPointersArrays.id]: programmingPointersArrays,
-  [programmingCppResource.id]: programmingCppResource,
   [embeddedCircuitBasics.id]: embeddedCircuitBasics,
-  [embeddedMcuStructure.id]: embeddedMcuStructure,
-  [embeddedClockReset.id]: embeddedClockReset,
-  [embeddedGpio.id]: embeddedGpio,
-  [embeddedInterrupts.id]: embeddedInterrupts,
-  [embeddedTimersDma.id]: embeddedTimersDma,
-  [embeddedDrivers.id]: embeddedDrivers,
-  [embeddedRtos.id]: embeddedRtos,
-  [communicationSerialBuses.id]: communicationSerialBuses,
-  [communicationProtocolFraming.id]: communicationProtocolFraming,
-  [controlSamplingModel.id]: controlSamplingModel,
-  [controlFeedback.id]: controlFeedback,
-  [controlPid.id]: controlPid,
-  [controlEstimationActuation.id]: controlEstimationActuation,
-  [projectBatchUrlProbe.id]: projectBatchUrlProbe,
-  [projectPlatformBringUp.id]: projectPlatformBringUp,
-  [projectCanMotorControl.id]: projectCanMotorControl,
-  [projectRefereeSystem.id]: projectRefereeSystem,
-  [roboticsBringUp.id]: roboticsBringUp,
-  [roboticsSystemIntegration.id]: roboticsSystemIntegration
+  [embeddedMcuStructure.id]: embeddedMcuStructure
 } satisfies Record<NodeId, NodeDefinition>
 
 /** 前端使用的节点数据。 */

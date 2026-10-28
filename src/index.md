@@ -29,7 +29,6 @@ features:
 <div class="capability-map">
   <VPLink href="/nodes/engineering/shell-basics/"><strong>我要开始修改工程</strong><span>从命令、路径、工具查找和运行环境开始。</span></VPLink>
   <VPLink href="/nodes/embedded/circuit-basics/"><strong>我要开始接触硬件</strong><span>从供电、参考地和逻辑电平开始。</span></VPLink>
-  <VPLink href="/nodes/control/sampling-model/"><strong>我要理解控制系统</strong><span>从对象、单位、状态和采样周期开始。</span></VPLink>
 </div>
 
 ## 学习图
@@ -41,13 +40,8 @@ features:
 ## 按专题浏览
 
 <div class="capability-map">
-  <VPLink href="/map/topics/engineering"><strong>工程与协作</strong><span>命令行、版本管理和调试。</span></VPLink>
-  <VPLink href="/map/topics/programming"><strong>C/C++ 与程序运行</strong><span>构建、对象、指针与资源管理。</span></VPLink>
-  <VPLink href="/map/topics/embedded"><strong>电子与嵌入式</strong><span>板级约束、外设与并发。</span></VPLink>
-  <VPLink href="/map/topics/communication"><strong>通信</strong><span>串行总线、帧与协议。</span></VPLink>
-  <VPLink href="/map/topics/control"><strong>控制与机器人</strong><span>采样、反馈、PID 与估计。</span></VPLink>
-  <VPLink href="/map/topics/robotics"><strong>RoboMaster 实践</strong><span>板级启动与系统联调。</span></VPLink>
-  <VPLink href="/map/topics/project-practice"><strong>项目实践</strong><span>工程、编程与嵌入式综合任务。</span></VPLink>
+  <VPLink href="/map/topics/engineering"><strong>工程与协作</strong><span>命令行、版本管理与远程协作。</span></VPLink>
+  <VPLink href="/map/topics/embedded"><strong>电子与嵌入式</strong><span>电路、电平与 MCU 结构。</span></VPLink>
 </div>
 
 ## 从问题进入

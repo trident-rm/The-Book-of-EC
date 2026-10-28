@@ -1,6 +1,6 @@
 import type { NodeId } from "./nodes.ts"
 
-const validNodeId: NodeId = "embedded.gpio"
+const validNodeId: NodeId = "embedded.mcu-structure"
 
 // @ts-expect-error NodeId 只能取 nodeIds 中提前声明的值。
 const unknownNodeId: NodeId = "embedded.unknown"
