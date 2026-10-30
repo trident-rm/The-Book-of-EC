@@ -19,7 +19,7 @@
   "dependencies": {
     "cytoscape": "^3.34.4",
     "cytoscape-dagre": "^4.0.1",
-    "motion-v": "^2.8.0"
+    "motion-v": "^2.9.0"
   },
   "devDependencies": {
     "@types/cytoscape-dagre": "^2.3.4",
@@ -36,7 +36,7 @@
     "wavedrom": "^3.8.0"
   },
   "engines": {
-    "node": ">=24 <25"
+    "node": ">=26 <27"
   },
-  "packageManager": "pnpm@12.15.0"
+  "packageManager": "pnpm@12.16.1"
 }
