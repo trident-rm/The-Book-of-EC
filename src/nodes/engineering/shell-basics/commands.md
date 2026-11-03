@@ -292,6 +292,8 @@ clang --help
 cmake --help
 ```
 
+如果帮助内容进入了 `less` 等分页器，按 `q` 退出，返回 Shell 提示符。
+
 注意：有些程序可能 `--help` 和 `-h` 显示的内容不同。
 
 对于 PowerShell cmdlet 应优先使用 `Get-Help`：

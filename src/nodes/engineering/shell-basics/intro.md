@@ -6,12 +6,12 @@
 
 注意区分以下概念：
 
-| 对象  | 作用                                  | Windows 上的例子      | Linux/macOS 上的例子   |
-| ----- | ------------------------------------- | --------------------- | ---------------------- |
-| 终端  | 显示文字并接收键盘输入的窗口          | Windows Terminal      | iTerm2、GNOME Terminal |
-| Shell | 读取命令、解析参数并启动程序          | PowerShell、`cmd.exe` | sh、Bash、Zsh、Fish    |
-| 命令  | 交给 Shell 的一段文本                 | `git status`          | `git status`           |
-| 程序  | 被 shell 启动，实际执行工作的应用程序 | `git.exe`             | `git`                  |
+| 对象  | 作用                                  | Windows 上的例子        | Linux/macOS 上的例子                              |
+| ----- | ------------------------------------- | ----------------------- | ------------------------------------------------- |
+| 终端  | 显示文字并接收键盘输入的窗口          | Windows Terminal        | Terminal、<br>iTerm2、Ghostty、<br>GNOME Terminal |
+| Shell | 读取命令、解析参数并启动程序          | PowerShell、`cmd.exe`   | sh、Bash、Zsh、Fish                               |
+| 命令  | 交给 Shell 的一段文本                 | `git status`            | `git status`                                      |
+| 程序  | 被 Shell 启动，实际执行工作的应用程序 | `git.exe`、`python.exe` | `git`、`python`                                   |
 
 同一个终端可以承载不同的 Shell。比如，同一个 Windows Terminal 可以一个标签页运行 PowerShell，另一个标签页运行 `cmd.exe` 或 WSL 中的 Bash。
 
@@ -20,6 +20,12 @@
 :::
 
 终端和 Shell 本质也都是应用程序。你可以使用操作系统默认自带的终端和 Shell，也可以安装使用第三方的终端和 Shell。不同的终端和 Shell 可能有不同的功能、外观和快捷键。
+
+::: info
+Windows 10/11 上通常默认自带的 Shell 有 `cmd.exe` 和 PowerShell 5.1。前者是较旧的 Windows 传统工具，笔者建议一般不再使用。
+
+另外还可自行安装使用 PowerShell 7.x（也被称为 `pwsh`），它是微软重构的版本，跨平台、开源、功能更强大。
+:::
 
 ## 一条命令如何运行
 
