@@ -2,56 +2,185 @@
 
 面对一个没用过的命令时，不需要先背下全部用法。先辨认命令结构，再确认实际工具，最后从工具自己的帮助中查证参数。
 
-## 命令名和参数
+## 命令运行流程
+
+以在 Git 仓库目录中输入以下命令并按下 Enter 为例。这里假设 `git` 对应已安装的 Git 可执行程序：
+
+```sh
+git log --oneline -n 5 --all
+```
+
+这条命令的运行过程可以概括为五步：
+
+1. **解析输入**：Shell 识别命令名 `git`，以及 `log`、`--oneline`、`-n`、`5`、`--all` 五个参数。
+2. **确定命令**：Shell 按自身的命令解析规则，查找 `git` 对应的可执行文件。不同 Shell 的搜索规则可能不同。
+3. **启动程序**：Shell 启动 Git 进程，将解析后的参数交给它。新进程还会继承当前工作目录和环境变量。
+4. **执行操作**：Git 按自己的规则解释 `log` 和各个参数，读取仓库和环境变量，执行操作并输出结果，或报告错误。参数的具体含义由 Git 决定。
+5. **等待结束**：这是一次前台执行，Shell 会等待 Git 结束，接收其退出状态（用于报告执行结果），然后重新显示提示符，等待下一条输入。
+
+`cd`、`pwd`、`echo` 这类命令则通常是 Shell 内置命令，而非外部程序，它们执行时不启动新进程。
+
+## 参数的分割和解析
+
+Shell 通常将空白字符作为参数的分隔符，成对的引号则可以把包含空格的文本组合成一个参数。
+
+下面的示例中，每条命令之后的注释是预期的输出：
+
+::: code-group
+
+```powershell [PowerShell 5.1]
+echo hello world         # echo 收到两个参数
+# hello
+# world
+
+echo hello   world       # echo 收到两个参数
+# hello
+# world
+
+echo "hello" "world"     # echo 收到两个参数
+# hello
+# world
+
+echo "hello   world"     # echo 收到一个参数
+# hello   world
+```
+
+```bash [Bash/Zsh]
+echo hello world         # echo 收到两个参数
+# hello world
+
+echo hello   world       # echo 收到两个参数
+# hello world
+
+echo "hello" "world"     # echo 收到两个参数
+# hello world
+
+echo "hello   world"     # echo 收到一个参数
+# hello   world
+```
+
+:::
+
+Shell 把解析后的参数传递给 `echo` 来执行。前三条示例对于 `echo` 来说没有任何区别，Shell 交给它的都是
+`hello` 和 `world` 两个参数。第四条示例中，`echo` 则只收到了
+<code>hello &nbsp; world</code> 这一个参数。引号和空格在这里发挥的都是 Shell 的语法作用，而不是 `echo` 的功能，没有参与到输出中。
+
+再来看一看路径的例子。假设当前目录下已有一个名为 `space dir` 的目录，比较下面两种写法：
+
+```sh
+cd space dir      # `space` 和 `dir` 分开传入
+cd "space dir"    # `space dir` 作为一个路径传入
+```
+
+第一条没有把目录名作为一个整体传入，具体行为取决于当前 Shell；第二条将完整目录名作为一个参数传入，进入 `space dir` 目录。
+
+<br>
+
+那么该如何把引号本身作为参数的一部分传给程序呢？不同的 Shell 转义方式不同：
+
+::: code-group
+
+```powershell [PowerShell 5.1]
+# PowerShell 中使用反引号转义：
+echo `"hello`" `"world`"
+# "hello"
+# "world"
+
+# 也可以用单双引号交替嵌套的方式：
+echo "'hello' 'world'"
+# 'hello' 'world'
+```
+
+```bash [Bash/Zsh]
+# Bash/Zsh 中使用反斜杠转义：
+echo \"hello\" \"world\"
+# "hello" "world"
+
+# 也可以用单双引号交替嵌套的方式：
+echo "'hello' 'world'"
+# 'hello' 'world'
+```
+
+:::
+
+第一个命令中，`echo` 收到两个参数：`"hello"` 和 `"world"`；第二个命令中，`echo` 收到一个参数：`'hello' 'world'`。
+
+<br>
+
+更多引号规则可见：
+
+- PowerShell 5.1: [about_Quoting_Rules](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_quoting_rules?view=powershell-5.1)
+- Bash Refernce Manual: [Quoting](https://www.gnu.org/software/bash/manual/html_node/Quoting.html)
+
+## 参数的形式
 
 观察下面这条命令：
 
 ```sh
-git log --oneline -n 5
+git log --oneline -n 5 --all
 ```
 
-Shell 会把它交给程序时保留参数的顺序：
+Shell 会解析出 `log`、`--oneline`、`-n`、`5` 和 `--all` 这五个参数，传递给 Git。这些参数到底分别是什么意思，则取决于 Git 的设计。
 
-| 位置       | 文本        | 常见作用             |
-| ---------- | ----------- | -------------------- |
-| 命令名     | `git`       | 指定要运行什么       |
-| 第一个参数 | `log`       | Git 将它解释为子命令 |
-| 第二个参数 | `--oneline` | 长选项               |
-| 第三个参数 | `-n`        | 短选项               |
-| 第四个参数 | `5`         | `-n` 的值            |
+理论上，各种参数长什么样子，程序想怎么规定都是可以的。但是大家一般会遵循一些常见约定，便于用户记忆和使用。
 
-“位置参数（Positional Parameters）”“选项（Options）”“子命令（Subcommands）”是程序赋予参数的语义，不是 Shell 从拼写中强制规定的。短选项、长选项也只是常见约定，不是所有工具共同遵守的语法标准。
-
-有些工具允许把短选项合并，有些工具使用 `/help`，还有些工具只接受固定位置的参数。不要仅凭外形推断一个陌生选项一定有效。
-
-::: tip 先判断失败发生在哪一层
-
-- Shell 报“无法识别”或“command not found”：通常还没有找到并启动程序。
-- 程序报“unknown option”：程序已经启动，但不接受该参数。
-- 程序报“missing argument”：选项可能存在，但缺少选项值或位置参数。
-
-:::
+| 参数        | 参数类型  | 含义                       |
+| ----------- | --------- | -------------------------- |
+| `log`       | 子命令    | 显示 commit 历史记录       |
+| `--oneline` | 长选项    | 每个 commit 只显示一行     |
+| `-n`        | 短选项    | 用于指定输出的 commit 数量 |
+| `5`         | `-n` 的值 | 只显示最新的 5 个 commit   |
+| `--all`     | 长选项    | 显示所有分支的 commit      |
 
 ### 长选项、短选项
 
-长选项通常以两个连字符开头，例如 `--help`；短选项以一个连字符开头，例如 `-h`。长选项通常更易读，而短选项则更节省空间。
+长选项指以两个连字符开头、具有较完整描述的选项，例如：
+
+```sh
+git --version
+git --help
+
+python --version
+python --help
+python --help-env
+```
+
+短选项以一个连字符开头，后跟一个字符，例如：
+
+```bash
+git -v
+python -V
+ls -a
+```
+
+有些程序支持将多个短选项连写在一起，例如：
+
+```bash
+ls -lAh
+ls -l -A -h
+
+rm -rf /path/to/directory
+rm -r -f /path/to/directory
+```
 
 很多时候，长选项会有一个对应的短选项别名。例如：
 
-```sh
+```bash
 # 查看 Git 版本：
 git --version
 git -v
 
-# 查看 CMake 帮助：
-cmake --help
-cmake -h
-```
+# 查看 Python 版本：
+python --version
+python -V
 
-```bash
-# 列出所有文件（包括隐藏文件）：
-ls --all
-ls -a
+# 强制递归地删除目录：
+rm --recursive --force /path/to/directory
+rm -rf /path/to/directory
+
+# Git 拉取时删除远程已删除的分支：
+git pull --prune
+git pull -p
 ```
 
 ### 带值选项
@@ -64,7 +193,7 @@ ls -a
   git log -n 5
   ```
 
-  Shell 会产生两个参数：`-n` 和 `5`，Git 将 `5` 解释为 `-n` 的值。
+  Git 将 `5` 解释为 `-n` 的值。
 
 - 等号连接选项和值：
 
@@ -72,7 +201,7 @@ ls -a
   git log --max-count=5
   ```
 
-  `--max-count=5` 是一个参数，Git 在其内部拆出选项名和值。
+  Shell 把 `--max-count=5` 作为一个参数传给 Git，Git 在其内部拆出选项名和值。
 
 - 短选项和值直接连写：
 
@@ -98,58 +227,48 @@ ls -a
 
   CMake 将 `build` 作为 `--build` 的值，`app`、`tests` 都作为 `--target` 的值。
 
-这些形式不能随意互换。某个程序支持 `--option=value`，不代表它也支持 `--option value`；逗号可能是分隔符，也可能只是值中的普通字符。对原生程序而言，空白和引号先决定传入几个参数，程序再解释每个参数；对 PowerShell cmdlet 而言，PowerShell 还会按参数声明进行类型转换和绑定。准确写法应以当前工具的帮助和官方文档为准。
+<br>
 
-## 空白和引号决定参数边界
+以上的约定通常见于 Unix 系的工具和程序。Windows 系程序的形式通常则不一样，例如：
 
-Shell 通常用空白分隔参数。先只观察参数边界：
+::: code-group
 
-```sh
-tool one two
-tool "one two"
+```powershell [PowerShell]
+Get-Help Remove-Item                           # 查看帮助信息
+Get-Help Get-ChildItem -Online                 # 联机查看
+
+Get-ChildItem -?                               # 查看帮助信息
+Remove-Item -?
+
+Get-ChildItem -Path C:\Parent -Depth 3         # 列出目标下三层以内的所有文件和目录
+Remove-Item "C:\path\to\dir" -Force -Recurse   # 递归地删除文件或目录
 ```
 
-第一行中的 `one` 和 `two` 是两个参数，第二行中的 `one two` 是一个参数。文件名或目录名含有空格时也需要引号：
+```cmd [CMD]
+rem 这是一条注释
 
-```sh
-git add hello.txt world.txt "hello world.txt"
+rem CMD 常用 `/?` 来查看帮助信息
+ipconfig /?
+waitfor /?
+
+rem 最多等待 100 秒，收到 CopyDone 信号后立即返回
+waitfor CopyDone /T 100
+
+rem 在 C 盘下递归查找名为 test 的文件
+where /r c:\ test
 ```
 
-Shell 会把它们拆成四个参数：`add`、`hello.txt`、`world.txt` 和 `hello world.txt`。
+:::
 
-## 命令不一定是可执行文件
-
-PowerShell 可以运行多种“命令”：
-
-- **Alias**：另一个命令的别名，例如 Windows 上的 `ls` 通常指向 `Get-ChildItem`；
-- **Function**：当前会话中定义的函数；
-- **Cmdlet**：PowerShell 提供的命令，例如 `Get-Command`；
-- **Application**：`git.exe`、`code.exe` 等外部可执行文件；
-- **ExternalScript**：可以由 PowerShell 执行的脚本。
-
-用 `Get-Command` 查看当前会话会运行什么：
-
-```powershell
-Get-Command ls
-Get-Command git
-Get-Command where
-```
-
-在 Bash、Zsh 等 POSIX Shell 中，则可以使用：
-
-```bash
-type ls
-type git
-type where
-```
-
-不同 Shell 的解析顺序并不完全相同。可靠的结论应来自当前会话的查询结果，而不是“我记得这个名字一般是什么”。
-
-## 帮助和版本
+## 学习陌生命令
 
 ### 帮助信息
 
-各种程序通常都会提供帮助信息，告知我们如何使用。一些常见程序及查看它们的帮助信息的方法如下：
+遇到陌生程序、命令、选项时，可以先尝试查看它的帮助信息，确认它的功能和语法。
+
+##### 如何打开帮助信息？
+
+这取决于程序自身的设计，但也有一些惯例。常见的方式有：
 
 ```sh
 # Git 的帮助入口：
@@ -173,7 +292,7 @@ clang --help
 cmake --help
 ```
 
-可以看出帮助入口的写法并不统一，但有一些常见约定。遇到陌生的应用程序时，可以先尝试这些常见写法打开其帮助文档。
+注意：有些程序可能 `--help` 和 `-h` 显示的内容不同。
 
 对于 PowerShell cmdlet 应优先使用 `Get-Help`：
 
@@ -183,6 +302,62 @@ Get-Help ls              # PowerShell 中的 `ls` 是 `Get-ChildItem` 的别名
 Get-Help Set-Location
 Get-Help cd              # PowerShell 中的 `cd` 是 `Set-Location` 的别名
 ```
+
+##### 如何读懂语法说明？
+
+帮助信息中对语法规则的描述也有一些常见约定。以 Git 的帮助信息为例：
+
+```sh
+git --help
+```
+
+```
+usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+           [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]
+           [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--bare]
+           [--git-dir=<path>] [--work-tree=<path>] [--namespace=<name>]
+           [--config-env=<name>=<envvar>] <command> [<args>]
+
+These are common Git commands used in various situations:
+
+start a working area (see also: git help tutorial)
+   clone     Clone a repository into a new directory
+   init      Create an empty Git repository or reinitialize an existing one
+
+work on the current change (see also: git help everyday)
+   add       Add file contents to the index
+   mv        Move or rename a file, a directory, or a symlink
+   restore   Restore working tree files
+...
+```
+
+usage 栏目列出了具体的语法结构。通常，方括号 `[]` 表示可选项，尖括号 `<>` 必选项，竖线 `|` 表示“或”的关系。上例中，我们可以看到：
+
+- `[-v | --version]` 表示 `-v` 和 `--version` 是可选的，但它们不能同时出现（互斥）（毕竟它们是等价的）。
+- `[-C <path>]` 表示 `-C` 后面必须跟一个值作为 `<path>`，但整个 `-C <path>` 是可选的。
+- `-p`、`--paginate`、`-P`、`--no-pager` 也是四个互斥的可选项（它们控制同一个语义维度）。
+- `<command>` 是必选项，表示必须指定一个子命令。子命令被列举在了下面的列表中，例如 `clone`、`init`、`add`、`mv` 等。
+
+```sh
+git add --help
+```
+
+```
+usage: git add [<options>] [--] <pathspec>...
+
+    -n, --[no-]dry-run    dry run
+    -v, --[no-]verbose    be verbose
+    -A, --[no-]all        add changes from all tracked and untracked files
+...
+```
+
+对于 `add` 子命令：
+
+- `<options>` 是选项（option），可以填写零个或多个。可用选项被列举在了下面：
+  - `-n`、`--dry-run`、`--no-dry-run` 是一组互斥的选项；
+  - `-v`、`--verbose`、`--no-verbose` 又是另一组互斥的选项。
+- `<pathspec>` 是路径模式，需有至少一个。（`...` 表示可以填写多个）
+- 中间的 `--` 是一个分隔符，表示后续的参数都被视为路径，而不是选项。当路径以 `-` 开头时，就需要用它来分隔，否则 Git 会误当作选项来解析。
 
 ### 版本信息
 
@@ -205,16 +380,3 @@ cmake --version
 ```
 
 有时候，小写的 `-v` 是 `--verbose` 的缩写，表示“详细输出”，而不是版本信息。
-
-## 【练习】调查真实工具
-
-依次调查以下命令：`git`、`g++`、`ninja`、`pip`、`code`、`calc`、`winget`、`wsl`.
-
-1. 在你的环境中，它是否是合法命令？如果是，接着完成下列步骤。
-2. 确认它的类型，是别名、cmdlet 还是外部程序。如果是外部程序，确认它的路径和文件名。
-3. 确认它的版本信息。
-4. 尝试打开它的帮助文档，确认至少一个选项的用法和含义。
-
-## 【拓展】
-
-- [PowerShell 引号规则](https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_quoting_rules)：处理变量、空格和复杂参数时查阅。
