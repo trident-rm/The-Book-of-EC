@@ -19,4 +19,7 @@ build-make/calc.o: src/calc.c include/calc.h | build-make
 build-make:
 	mkdir -p build-make
 
-.PHONY: all
+clean:
+	rm -rf build-make
+
+.PHONY: all clean

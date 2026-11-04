@@ -50,7 +50,7 @@ Make 根据文件依赖决定执行哪些命令；CMake 用目标及其属性描
 2. 两个 `.o` 都依赖各自的 `.c` 和公共头文件；静态库依赖 `calc.o`，程序依赖 `main.o` 与静态库。
 3. 规则下方就是上一节手动执行过的编译、归档和链接命令。
 
-`$(CC)` 等写法引用 Make 变量。这里用 `CPPFLAGS` 保存预处理选项，用 `CFLAGS` 保存 C 编译选项；变量只有被命令引用后才起作用。`| build-make` 要求目录先存在，同时避免因目录时间戳变化而触发重编译。`.PHONY: all` 将 `all` 声明为任务名。
+`$(CC)` 等写法引用 Make 变量。这里用 `CPPFLAGS` 保存预处理选项，用 `CFLAGS` 保存 C 编译选项；变量只有被命令引用后才起作用。`| build-make` 要求目录先存在，同时避免因目录时间戳变化而触发重编译。`.PHONY: all clean` 将两者声明为任务目标，避免同名文件影响执行。
 
 第一次构建并运行：
 
@@ -104,6 +104,18 @@ make -B CPPFLAGS='-Iinclude -DCALC_TRACE=1'
 
 这次应先输出日志，再输出计算结果。切回默认开关时也需要重建。实际工程可以用配置文件依赖、独立构建目录或其他机制管理配置变化；正确的增量构建不能只考虑 `.c` 文件。
 
+### 清理构建产物
+
+需要从头构建时，可以先清理再构建：
+
+```sh
+make clean
+make
+./build-make/calc-demo
+```
+
+`clean` 目标执行 `rm -rf build-make`，删除本例的 Make 构建产物。下次 `make` 应重新创建目录，完成两次编译、一次归档和一次链接；本次使用默认宏开关，程序只打印 `2 + 3 = 5`。尚未构建或重复执行 `make clean` 也应成功。
+
 ## CMake：用目标描述工程
 
 Makefile 可以用模式规则、自动依赖等机制管理更大的工程，但仍需维护源文件、编译要求、库依赖和相应规则。CMake 提供更高一层的描述：有哪些可执行程序和库，各自使用什么源码，又依赖谁。
@@ -122,7 +134,7 @@ Makefile 可以用模式规则、自动依赖等机制管理更大的工程，�
 
 ### CMakeLists.txt
 
-在工程根目录新建 `CMakeLists.txt`，从文件树中复制它的完整内容。其中警告选项约定用于 GCC／Clang：
+本例只需要三个源码／头文件和 `CMakeLists.txt`。在工程根目录新建 `CMakeLists.txt`，从文件树中复制它的完整内容。其中警告选项约定用于 GCC／Clang：
 
 <CodeTree title="calc-demo · CMake" :files="cmakeFiles" initial-file="CMakeLists.txt" :initialSidebarExpanded="false">
 <template #header>
@@ -138,11 +150,6 @@ Makefile 可以用模式规则、自动依赖等机制管理更大的工程，�
 <template #main>
 
 <<< ./assets/calc-demo/src/main.c{c}
-
-</template>
-<template #makefile>
-
-<<< ./assets/calc-demo/makefile{makefile}
 
 </template>
 <template #cmake>
@@ -193,7 +200,7 @@ Makefile 可以用模式规则、自动依赖等机制管理更大的工程，�
 
 ### 配置、生成与构建
 
-先配置并生成 Unix Makefiles，再构建、运行：
+选择 `Unix Makefiles` 生成器后，CMake 会在 `build-cmake/` 中生成自己的 Makefile，无需上一节手写的 Makefile。先配置并生成，再构建、运行：
 
 ```sh
 cmake -S . -B build-cmake -G "Unix Makefiles" \

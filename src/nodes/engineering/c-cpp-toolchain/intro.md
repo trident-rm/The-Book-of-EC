@@ -21,7 +21,7 @@ C/C++ 源文件要经过编译、链接才能成为可执行程序。本节点�
 - 先用 `-O0` 观察产物，再与 `-O2` 比较。
 - 命令在各示例的根目录执行。`build/`、`build-cmake/` 等目录只保存构建产物。
 
-准备 GCC、Clang、GNU Binutils（`ar`、`nm`、`objdump`）、GNU Make、CMake 3.20 或更高版本，以及 Ninja。GCC 和 Clang 的环境中还需要可用的 C/C++ 标准库及开发头文件。
+准备 GCC、Clang、GNU Binutils（`ar`、`nm`、`objdump`）、GNU Make、CMake 3.28 或更高版本，以及 Ninja。GCC 和 Clang 的环境中还需要可用的 C/C++ 标准库及开发头文件。
 
 先确认工具入口：
 
@@ -38,7 +38,7 @@ cmake --version
 
 程序调用 `calc_add(2, 3)`，打印 `2 + 3 = 5`。编译时开启 `CALC_TRACE` 后，会先打印 `[calc] add(2, 3)`。
 
-正文会按步骤给出完整代码和文件路径，复制到自己的练习目录即可。单文件示例放在 `single-file/`，多文件工程放在 `calc-demo/`；最后一节再为同一个多文件工程添加 Makefile 和 CMakeLists.txt。
+正文会按步骤给出完整代码和文件路径，复制到自己的练习目录即可。单文件示例放在 `single-file/`，多文件工程放在 `calc-demo/`；最后一节分别用 Makefile 和 CMakeLists.txt 管理同一个多文件工程的构建。
 
 ## 学习路线
 
