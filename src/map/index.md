@@ -18,6 +18,6 @@ next: false
 专题图从总图中选择一组相关节点，并以弱化节点补充直接的专题外先修。专题成员没有固定阅读顺序。
 
 <div class="capability-map">
-  <VPLink href="/map/topics/engineering"><strong>工程与协作</strong><span>命令行、版本管理与远程协作。</span></VPLink>
+  <VPLink href="/map/topics/engineering"><strong>工程与协作</strong><span>命令行、C/C++ 构建、版本管理与远程协作。</span></VPLink>
   <VPLink href="/map/topics/embedded"><strong>电子与嵌入式</strong><span>电路、电平与 MCU 结构。</span></VPLink>
 </div>
