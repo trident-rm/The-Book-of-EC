@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import { makeFiles, cmakeFiles } from "./example-files.ts"
+</script>
+
 # Make、CMake 与 Ninja
 
 Make 根据文件依赖决定执行哪些命令；CMake 用目标及其属性描述工程，再生成供 Make、Ninja 等工具执行的构建系统。两者可以配合使用。
@@ -15,9 +19,30 @@ Make 根据文件依赖决定执行哪些命令；CMake 用目标及其属性描
 
 目标文件不存在，或某个前置文件比它更新时，Make 会执行对应命令，并沿依赖关系更新后续目标。命令行通常必须以真正的 Tab 开头。
 
-在工程根目录新建 `Makefile`，复制以下完整内容：
+在工程根目录新建 `Makefile`，从文件树中复制它的完整内容；其他三个文件沿用上一节的源码：
+
+<CodeTree title="calc-demo · Make" :files="makeFiles" initial-file="Makefile" :initialSidebarExpanded="false">
+<template #header>
+
+<<< ./assets/calc-demo/include/calc.h{c}
+
+</template>
+<template #calc>
+
+<<< ./assets/calc-demo/src/calc.c{c}
+
+</template>
+<template #main>
+
+<<< ./assets/calc-demo/src/main.c{c}
+
+</template>
+<template #makefile>
 
 <<< ./assets/calc-demo/makefile{makefile}
+
+</template>
+</CodeTree>
 
 读这份文件时，先看三件事：
 
@@ -97,9 +122,35 @@ Makefile 可以用模式规则、自动依赖等机制管理更大的工程，�
 
 ### CMakeLists.txt
 
-在工程根目录新建 `CMakeLists.txt`，复制以下完整内容。其中警告选项约定用于 GCC／Clang：
+在工程根目录新建 `CMakeLists.txt`，从文件树中复制它的完整内容。其中警告选项约定用于 GCC／Clang：
+
+<CodeTree title="calc-demo · CMake" :files="cmakeFiles" initial-file="CMakeLists.txt" :initialSidebarExpanded="false">
+<template #header>
+
+<<< ./assets/calc-demo/include/calc.h{c}
+
+</template>
+<template #calc>
+
+<<< ./assets/calc-demo/src/calc.c{c}
+
+</template>
+<template #main>
+
+<<< ./assets/calc-demo/src/main.c{c}
+
+</template>
+<template #makefile>
+
+<<< ./assets/calc-demo/makefile{makefile}
+
+</template>
+<template #cmake>
 
 <<< ./assets/calc-demo/cmake-lists.txt{cmake}
+
+</template>
+</CodeTree>
 
 这些 API 各自负责一件事：
 

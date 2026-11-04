@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import { sourceFiles } from "./example-files.ts"
+</script>
+
 # 多文件、静态库与增量构建
 
 每个 `.c` 文件可以分别编译成目标文件，再通过链接组成程序。头文件提供共享声明，静态库组织目标文件，构建依赖则决定修改后需要重做哪些工作。
@@ -11,28 +15,29 @@ mkdir -p calc-demo/src calc-demo/include
 cd calc-demo
 ```
 
-按下面的路径创建文件，并分别复制后面的代码：
+按文件树中的路径创建文件，点击文件名查看并复制完整代码：
 
-```text
-calc-demo/
-├── include/
-│   └── calc.h
-└── src/
-    ├── calc.c
-    └── main.c
-```
-
-`include/calc.h` 提供公开声明。头文件保护宏使它在同一个翻译单元中被重复包含时，声明区只展开一次：
+<CodeTree title="calc-demo" :files="sourceFiles" initial-file="src/main.c">
+<template #header>
 
 <<< ./assets/calc-demo/include/calc.h{c}
 
-`src/calc.c` 定义函数，并负责库内部的日志开关：
+</template>
+<template #calc>
 
 <<< ./assets/calc-demo/src/calc.c{c}
 
-`src/main.c` 通过声明使用计算模块：
+</template>
+<template #main>
 
 <<< ./assets/calc-demo/src/main.c{c}
+
+</template>
+</CodeTree>
+
+- `include/calc.h` 提供公开声明。头文件保护宏使它在同一个翻译单元中被重复包含时，声明区只展开一次。
+- `src/calc.c` 定义函数，并负责库内部的日志开关。
+- `src/main.c` 通过声明使用计算模块。
 
 一个源文件连同它包含的头文件等内容，经过预处理后形成一个**翻译单元（translation unit）**。本例有两个翻译单元：`main.c` 和 `calc.c` 分别经过预处理得到的整体。它们包含同一个头文件，但仍各自编译，局部宏状态也各自独立。
 
