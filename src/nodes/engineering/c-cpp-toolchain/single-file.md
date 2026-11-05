@@ -1,21 +1,12 @@
 # 单文件编译与四个阶段
 
-`gcc main.c -o app` 可以一次完成构建。要理解它做了什么，可以要求驱动程序停在中间阶段，再检查留下的产物。
-
 ## 从一条编译命令开始
 
-创建并进入单文件练习目录：
-
-```sh
-mkdir -p single-file
-cd single-file
-```
-
-新建 `main.c`，复制以下完整代码：
+进入一个空目录，新建 `main.c` 写入以下代码：
 
 <<< ./assets/single-file/main.c{c}
 
-先编译并运行：
+使用 gcc 编译并运行：
 
 ```sh
 mkdir -p build
@@ -25,7 +16,7 @@ gcc -std=c17 -Wall -Wextra -Wpedantic -O0 main.c -o build/calc-demo
 
 预期输出：
 
-```text
+```
 2 + 3 = 5
 ```
 
@@ -38,13 +29,15 @@ clang -std=c17 -Wall -Wextra -Wpedantic -O0 main.c -o build/calc-clang
 
 它应产生相同的程序输出；生成的机器代码和诊断文本可以不同。
 
-| 参数                       | 本例中的含义                           |
-| -------------------------- | -------------------------------------- |
-| `main.c`                   | 输入源文件                             |
-| `-o build/calc-demo`       | 指定最终输出文件路径；父目录需要先存在 |
-| `-std=c17`                 | 选择 C17 语言模式                      |
-| `-Wall -Wextra -Wpedantic` | 开启几组有助于发现问题及扩展用法的诊断 |
-| `-O0`                      | 使用便于初步观察代码对应关系的优化等级 |
+| 参数                             | 本例中的含义                           |
+| -------------------------------- | -------------------------------------- |
+| `main.c`                         | 输入源文件                             |
+| `-o build/calc-demo`             | 指定最终输出文件路径；父目录需要先存在 |
+| `-std=c17`                       | 选择 C17 语言模式                      |
+| `-Wall`, `-Wextra`, `-Wpedantic` | 开启几组有助于发现问题及扩展用法的诊断 |
+| `-O0`                            | 使用便于初步观察代码对应关系的优化等级 |
+
+接下来我们来详细解释。
 
 ## 宏定义、警告与优化
 
@@ -53,20 +46,18 @@ clang -std=c17 -Wall -Wextra -Wpedantic -O0 main.c -o build/calc-clang
 源码用 `#ifndef` 为 `CALC_TRACE` 提供默认值 `0`。命令行定义同名宏后，这个默认定义就会被跳过：
 
 ```sh
-gcc -std=c17 -Wall -Wextra -Wpedantic -O0 -DCALC_TRACE=1 main.c -o build/calc-trace
+gcc -std=c17 -DCALC_TRACE=1 main.c -o build/calc-trace
 ./build/calc-trace
 ```
 
 预期输出：
 
-```text
+```
 [calc] add(2, 3)
 2 + 3 = 5
 ```
 
 `-DNAME=value` 提供宏的替换内容；`-DNAME` 等价于定义为 `1`。它影响本次命令中要预处理的源文件。
-
-本例按数值使用开关，因此写 `#if CALC_TRACE`。如果传入 `-DCALC_TRACE=0`，宏仍然已定义，`#ifdef CALC_TRACE` 依然成立，`#if CALC_TRACE` 才会排除日志代码。[GCC 条件编译文档](https://gcc.gnu.org/onlinedocs/cpp/If.html)解释这种判定方式。
 
 ### `-W...`：请求诊断
 
@@ -82,27 +73,55 @@ int main(void)
 }
 ```
 
+对同一份源码依次执行三组命令。每次编译后立即用 `echo $?` 查看上一条命令的退出状态：`0` 表示成功，非零表示失败。
+
 ```sh
-gcc -std=c17 -Wall -Wextra -Wpedantic -O0 unused.c -o build/unused
+gcc -std=c17 unused.c -o build/unused-default
+echo $?
+
+gcc -std=c17 -Wall unused.c -o build/unused-warning
+echo $?
+
+gcc -std=c17 -Wall -Werror unused.c -o build/unused-error
+echo $?
 ```
 
-应看到类似 `unused variable 'unused'` 的警告，但通常仍会生成程序。警告和阻止当前构建的错误需要分别处理；具体启用了什么诊断，应查 [GCC 警告选项](https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html)。
+在 GCC 13.3.0 下，结果如下；具体诊断文字可能随版本变化：
+
+| 额外选项        | 诊断               | 退出状态 | 本次是否生成程序 |
+| --------------- | ------------------ | -------- | ---------------- |
+| 无              | 本例无诊断         | `0`      | 是               |
+| `-Wall`         | 未使用变量的警告   | `0`      | 是               |
+| `-Wall -Werror` | 同一问题被视为错误 | 非零     | 否               |
+
+后两组的诊断分别类似：
+
+```
+warning: unused variable 'unused' [-Wunused-variable]
+error: unused variable 'unused' [-Werror=unused-variable]
+```
+
+第一组没有额外开启警告，不代表 GCC 关闭了所有诊断；只是本例的问题没有被默认报告。`-Wall` 使它被报告为警告，编译仍能成功。
+
+`-Werror` 将产生的警告视为错误，可用于让自动构建在出现警告时失败。
 
 ### `-O...`：选择优化等级
 
 优化会改变生成代码、编译耗时和调试时的观察结果。`-O0` 适合先观察源代码与汇编的大致关系；`-O2` 开启更多优化，可能内联函数、折叠常量或消除无用代码。
 
-`-O0` 也包含生成代码所必需的转换，`-O2` 则不保证每个程序都更快或更小。对本例，开启日志与否由宏决定，优化等级不会把被预处理排除的日志重新加入程序。各等级具体控制什么，可查 [GCC 优化选项](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html)。
+不过，`-O0` 也包含生成代码所必需的转换，`-O2` 则不保证每个程序都更快或更小。
+
+各等级具体控制什么，可查 [GCC 优化选项](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html)。
 
 ## 四个阶段及产物
 
 本例用下面的模型观察构建：
 
 ```mermaid
-flowchart LR
-    c["main.c"] -->|预处理| i["main.i：C 文本"]
-    i -->|编译| s["main.s：汇编文本"]
-    s -->|汇编| o["main.o：目标文件"]
+flowchart
+    c["<code>main.c</code>"] -->|预处理| i["<code>main.i</code>：C 文本"]
+    i -->|编译| s["<code>main.s</code>：汇编文本"]
+    s -->|汇编| o["<code>main.o</code>：目标文件"]
     o -->|链接| app["可执行程序"]
 ```
 
@@ -174,7 +193,7 @@ objdump -dr build/main.o
 
 `nm` 列出符号，忽略地址后可找到：
 
-```text
+```
 T calc_add
 T main
 U printf
@@ -184,7 +203,7 @@ U printf
 
 `objdump -dr` 把机器代码反汇编并显示重定位信息。某条加法指令可能显示为：
 
-```text
+```
 10:  01 d0    add %edx,%eax
 ```
 
@@ -201,21 +220,3 @@ file build/calc-staged
 `gcc` 驱动链接器，将目标文件与所需的启动支持和库组合起来，处理符号引用及地址安排。这里通过默认的 C 库链接满足 `printf` 等引用。
 
 `file` 的结果应包含 `executable`，运行应打印 `2 + 3 = 5`。常见 Linux 环境生成的是动态链接程序；运行时加载器还会参与加载所需共享库。链接完成不表示所有库实现都已复制进可执行文件。
-
-## 停止位置与内部步骤
-
-从 `.c` 开始时，`-E`、`-S`、`-c` 分别要求停在预处理、编译、汇编之后。比如：
-
-```sh
-gcc -std=c17 -O0 -c main.c -o build/direct.o
-```
-
-这会先预处理、编译，再汇编；`-c` 不表示只做其中一个阶段。
-
-前面用 `.i → .s → .o` 串接，是为了单独观察产物。正常的一条构建命令可能通过集成工具或管道传递中间结果，不会把每份中间文件都保存在目录中。[GCC 输出控制文档](https://gcc.gnu.org/onlinedocs/gcc/Overall-Options.html)说明输入后缀和停止选项如何共同决定执行哪些阶段。
-
-## 验证理解
-
-1. 关闭和开启日志各生成一份 `.i`，确认日志调用在哪一步出现或消失。
-2. 找出 `.o` 中定义的符号及尚未满足的引用，解释为什么 `gcc -c` 成功不代表整个程序已经构建成功。
-3. 对比两种优化等级的 `.s`，并确认生成程序的可观测输出仍符合源码约定。

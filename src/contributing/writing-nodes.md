@@ -27,7 +27,7 @@ next: false
 
 节点私有的 Vue 组件和静态资源与正文放在同一节点目录，并分别进入 `components/` 和 `assets/`：
 
-```text
+```
 src/nodes/<domain>/<slug>/
 ├── index.md
 ├── meta.ts

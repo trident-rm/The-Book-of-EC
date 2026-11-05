@@ -8,7 +8,7 @@
 
 GitHub 仓库通常提供 SSH 和 HTTPS 两类 URL：
 
-```text
+```
 git@github.com:OWNER/REPOSITORY.git
 https://github.com/OWNER/REPOSITORY.git
 ```
@@ -35,7 +35,7 @@ git remote -v
 
 每个 remote 通常显示 fetch 和 push 两个 URL。例如：
 
-```text
+```
 origin  git@github.com:OWNER/REPOSITORY.git (fetch)
 origin  git@github.com:OWNER/REPOSITORY.git (push)
 ```

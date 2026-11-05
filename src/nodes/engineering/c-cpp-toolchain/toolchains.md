@@ -1,14 +1,14 @@
 # 标准、实现与工具链
 
-语言标准规定程序的含义和实现必须满足的要求；工具链把这些规则落实为具体工具和库。选择了同一语言标准，也仍需核对工具版本、扩展、选项和二进制兼容性。
+语言**标准**规定程序的含义和**实现**必须满足的要求；**工具链**把这些规则落实为具体工具和库。选择了同一语言标准，也仍需核对工具版本、扩展、选项和二进制兼容性。
 
 ## 标准规定什么
 
-C 和 C++ 是分别演进的语言，各自有标准。例如 C11、C17、C23，以及 C++17、C++20。版本名称用于区分规则集合，不是编译器名称；C 程序也不保证能作为 C++ 程序编译。
+C 和 C++ 是分别演进的语言，各自有标准。例如 C99、C11、C17、C23 等，以及 C++11、C++17、C++20、C++23 等。它们按年份编号。
 
-标准覆盖语法、语义和标准库接口等内容。例如，C 标准规定 `int` 的最低取值范围、整数运算规则和 `printf` 的接口，但没有要求所有平台上的 `int` 宽度相同，也没有规定必须生成哪几条汇编指令。
+**标准**覆盖语法、语义和标准库接口等内容。例如，C 标准规定 `int` 的最低取值范围、整数运算规则和 `printf` 的接口，但没有要求所有平台上的 `int` 宽度相同，也没有规定必须生成哪几条汇编指令。
 
-有些行为由实现选择并记录，例如普通 `char` 的有符号性；有些行为属于未定义行为，例如有符号整数溢出，此时标准不保证程序结果。更换工具链或优化等级后暴露的问题，需要先判断程序是否依赖这些边界。
+有些行为，**标准**给出了几种可选的方案，具体采用哪种方案则由**实现**来决定，例如普通 `char` 的有符号性。有些行为属于未定义行为，例如有符号整数溢出后的行为是什么，是不被**标准**规定的；这意味着，无论发生什么都是符合标准规范的。
 
 [WG14 官方页面](https://www.open-std.org/jtc1/sc22/wg14/)提供 C 标准及工作文档的入口；[GCC 的实现定义行为文档](https://gcc.gnu.org/onlinedocs/gcc/C-Implementation.html)说明 GCC 如何记录标准留给实现的选择。遇到具体行为时，应查对应实现和平台的说明。
 
@@ -24,19 +24,19 @@ C 和 C++ 是分别演进的语言，各自有标准。例如 C11、C17、C23，
 | 标准库与运行时支持 | 提供标准接口实现及程序运行所需的支持 | C 标准库、C++ 标准库等         |
 | 辅助工具           | 创建归档、查看符号和机器代码         | `ar`、`nm`、`objdump`          |
 
-日常说“用 GCC 编译”时，通常是在调用 `gcc` 驱动程序。它会依据输入文件和选项安排预处理、编译、汇编与链接。编译器、链接器、标准库可以来自不同项目，具体组合取决于安装环境。
+日常说“用 GCC 编译”时，通常是在调用 `gcc` 驱动程序。它会依据输入文件和选项安排预处理、编译、汇编与链接。
 
 ## 常见实现与工具组合
 
 | 名称        | 应怎样认识它                                             | 使用时关注的差异                                                                    |
 | ----------- | -------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| GCC         | GNU 的编译器集合，C/C++ 常用入口为 `gcc`、`g++`          | 支持的标准版本、GNU 扩展、选项和所配套的库                                          |
+| GCC         | GNU Compiler Collection，提供了 `gcc`、`g++`             | 支持的标准版本、GNU 扩展、选项和所配套的库                                          |
 | LLVM／Clang | Clang 是 LLVM 项目的 C 家族编译器；LLVM 还提供其他工具   | 许多 GCC 风格选项可通用，但诊断、扩展和选项细节仍有差异；链接器与标准库也有多种组合 |
 | MSVC        | 微软的 C/C++ 编译和构建工具体系，典型入口为 `cl`、`link` | 常见选项写作 `/I`、`/D`、`/O2`，还需核对 Windows 库与二进制约定                     |
 
 Visual Studio 是 IDE，MSVC 是其中可以使用的工具体系。编辑器界面相同，也可能配置不同的工具链；应查看实际执行的命令。
 
-MinGW-w64 提供 Windows 相关的头文件、导入库和支持库等，通常与 GCC 或 LLVM 组合。它与编译器处于不同层次。已有的 [WinLibs 安装示例](../shell-basics/package-management.md#案例二-winlibs)展示的就是一套打包好的组合。
+MinGW-w64 提供 Windows 相关的头文件、导入库和支持库等，通常与 GCC 或 LLVM 组合。它与编译器处于不同层次。[WinLibs 安装示例](../shell-basics/package-management.md#案例二-winlibs)展示的就是一套打包好的组合。
 
 [Clang 工具链文档](https://clang.llvm.org/docs/Toolchain.html)可用于核对其编译器、链接器和库的组合；[MSVC 构建参考](https://learn.microsoft.com/en-us/cpp/build/reference/c-cpp-building-reference)用于查找微软工具及选项；[MinGW-w64 官方介绍](https://www.mingw-w64.org/)说明它提供的支持内容。
 
@@ -50,62 +50,124 @@ MinGW-w64 提供 Windows 相关的头文件、导入库和支持库等，通常�
 - **扩展和平台接口**：是否使用 GNU 扩展或操作系统接口。例如 `<unistd.h>` 属于 POSIX 接口，不能把它当作 ISO C 标准库的一部分。
 - **选项**：宏定义、头文件路径、警告和优化选项的写法及含义是否相同。
 
-本节点显式指定 `-std=c17`，使实验使用明确的语言模式。GCC 的 `-std=gnu17` 则选择带 GNU 扩展的模式。指定 `-std=c17` 也不意味着所有扩展都会被拒绝，诊断选项还会影响编译器怎样报告它们。[GCC 语言模式文档](https://gcc.gnu.org/onlinedocs/gcc/C-Dialect-Options.html)说明这些选项的边界。
-
 ### 二进制兼容性
 
 拿到一个已经编译好的库，还要检查它能否和当前程序一起链接、运行。
 
 **ABI（应用二进制接口）**描述二进制之间如何配合，例如参数怎样传递、数据怎样布局、符号怎样命名。兼容性还涉及目标平台、文件格式、编译选项和运行库。
 
-选择同一语言标准不能保证 ABI 相同；不同品牌的编译器也可能在满足相同约定时生成兼容产物。应依据库的发布说明和工具链文档核对，不能仅凭“都是 C++17”作判断。[GCC 二进制兼容性说明](https://gcc.gnu.org/onlinedocs/gcc/Compatibility.html)列出了需要协调的条件。
+选择同一语言标准不能保证 ABI 相同。
 
-## C++ 的几个构建差异
+## 验证：扩展支持的实现差异
 
-下面单独使用 C++。保存为 `hello.cpp`：
+下面单独使用 C++17，对比 GCC 与 Clang 的扩展支持。以下结果实测于 Clang 18.1.3 和 GCC 13.3.0；其他版本的支持情况和诊断文字可能不同。
+
+### 直接依赖实现扩展
+
+将下面的代码保存为 `point.cpp`：
 
 ```cpp
-#include <iostream>
+#include <cstdio>
+
+struct Point {
+    int x;
+    int y;
+};
 
 int main()
 {
-    std::cout << "hello\n";
+    Point point{2, 3};
+    __builtin_dump_struct(&point, &std::printf);
+    return 0;
 }
 ```
 
-可分别使用：
+用 Clang 编译并运行：
 
 ```sh
-g++ -std=c++17 -Wall -Wextra -Wpedantic hello.cpp -o hello-gcc
-clang++ -std=c++17 -Wall -Wextra -Wpedantic hello.cpp -o hello-clang
-./hello-gcc
-./hello-clang
+clang++ -std=c++17 point.cpp -o point-clang
+./point-clang
 ```
 
-两个程序都应打印 `hello`。注意三个区别：
+```
+Point {
+  int x = 2
+  int y = 3
+}
+```
 
-1. 语言模式改为 `-std=c++17`，源码使用 C++ 规则。
-2. `g++` 会自动加入 C++ 标准库链接；`gcc` 虽然能根据 `.cpp` 后缀识别 C++，却不会自动加入这项链接。直接替换命令名可能在链接阶段失败。
-3. C++ 的标准库实现也有选择，例如 libstdc++ 和 libc++。选择编译器时，还要核对实际使用的库及 ABI 要求。
+再用 GCC 编译同一份源码：
 
-[GCC 的 C++ 编译说明](https://gcc.gnu.org/onlinedocs/gcc/Invoking-G_002b_002b.html)解释 `gcc` 与 `g++` 的职责差异；标准库组合可查上面的 Clang 工具链文档。后续示例恢复使用 C。
+```sh
+g++ -std=c++17 point.cpp -o point-gcc
+```
 
-## 验证：被接受的扩展
+```
+error: '__builtin_dump_struct' was not declared in this scope
+```
 
-在练习目录保存 `extension.c`：
+两条命令选择了同一语言标准，结果仍不同。因为 `__builtin_dump_struct` 不属于标准 C++17，而是 Clang 提供的内建扩展，本例实测的 GCC 版本并不支持它。
 
-```c
-int main(void)
+[Clang](https://clang.llvm.org/docs/LanguageExtensions.html) 和 [GCC](https://gcc.gnu.org/onlinedocs/gcc/C-Extensions.html) 都各自提供了很多标准之外的扩展，以增强 C/C++ 的能力。但是这也带来了另一个问题：同一份代码在不同实现上可能有不同的行为，甚至无法编译。
+
+### 用条件编译提供备用实现
+
+将 `point.cpp` 改为：
+
+```cpp
+#include <cstdio>
+
+#ifndef __has_builtin
+#define __has_builtin(name) 0
+#endif
+
+struct Point {
+    int x;
+    int y;
+};
+
+int main()
 {
-    return ({ int value = 0; value; });
+    Point point{2, 3};
+
+#if __has_builtin(__builtin_dump_struct)
+    __builtin_dump_struct(&point, &std::printf);
+#else
+    std::printf("Point { x = %d, y = %d }\n", point.x, point.y);
+#endif
+
+    return 0;
 }
 ```
 
-其中 `({ ... })` 是 GNU 的语句表达式扩展。分别执行：
+**条件编译**在预处理时选择代码分支，未选中的分支不参与后续编译：
+
+- `__has_builtin(name)` 检测当前实现是否支持指定内建函数，支持时结果为非零，否则为 `0`。
+- 如果实现没有提供 `__has_builtin`，开头的 `#ifndef` 为它定义一个总是返回 `0` 的备用宏。
+- `#if` 在支持扩展时保留自动打印；否则保留 `#else` 中手动打印字段的标准 C++ 代码。
+
+重新分别编译并运行：
 
 ```sh
-gcc -std=gnu17 -Wall -Wextra extension.c -o extension-gnu
-gcc -std=c17 -Wall -Wextra -Wpedantic extension.c -o extension-iso
+clang++ -std=c++17 point.cpp -o point-clang
+./point-clang
+
+g++ -std=c++17 point.cpp -o point-gcc
+./point-gcc
 ```
 
-第一条命令在 GNU 模式下接受它；第二条应报告与 ISO C 不符的警告，但仍可能成功生成程序。这个实验说明：编译成功、没有错误、符合所选标准，是需要分别判断的事情。[GCC 语句表达式文档](https://gcc.gnu.org/onlinedocs/gcc/Statement-Exprs.html)说明该扩展的语法与限制。
+这次两者都应成功。Clang 的输出与前面相同，GCC 的备用分支打印：
+
+```
+Point { x = 2, y = 3 }
+```
+
+两种实现都输出了相同的字段值，排版不同。以后某个实现增加了该扩展，能力探测也能自动选中扩展分支。
+
+这里优先检测能力，而不是猜测编译器品牌：Clang 也定义了 GNU 兼容宏 `__GNUC__`，单独检查它不能区分 GCC 与 Clang。[Clang 的能力探测说明](https://clang.llvm.org/docs/LanguageExtensions.html#has-builtin)给出备用宏的写法，[GCC 的 `__has_builtin` 文档](https://gcc.gnu.org/onlinedocs/cpp/_005f_005fhas_005fbuiltin.html)说明其在当前语言及模式下的判断规则。
+
+## C++ 的构建入口与库
+
+C++ 源码通常使用 `g++`、`clang++` 构建，并通过 `-std=c++17` 等选项选择语言模式。`gcc` 能根据 `.cpp` 后缀识别 C++，但不会自动加入 C++ 标准库链接；`g++` 会加入。因此直接替换驱动程序，可能在链接阶段失败。[GCC 的 C++ 编译说明](https://gcc.gnu.org/onlinedocs/gcc/Invoking-G_002b_002b.html)解释了这一差异。
+
+C++ 标准库也有不同实现，例如 libstdc++ 和 libc++。选择编译器时，还要核对实际使用的标准库及 ABI 要求；本例的源码兼容处理不能保证任意已编译库之间的二进制兼容。后续示例恢复使用 C。
