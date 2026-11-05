@@ -69,38 +69,69 @@ gcc build/main.o -o build/main
 2. 怎么修改命令，使其正确工作？
 3. 合并上一小节的命令，用一条命令一次性编译两个源文件并链接成可执行程序。
 
+## 归档：把目标文件组织成静态库
+
+静态库通常是目标文件的归档，可以将多个目标文件组织在一个 `.a` 文件中。本例只把 `build/calc.o` 一个目标放入 `build/libcalc.a`，`build/main.o` 仍单独参与最终链接：
+
+```sh
+ar rcs build/libcalc.a build/calc.o
+ar t build/libcalc.a
+```
+
+第二条命令列出归档成员，应看到 `calc.o`。归档步骤没有生成可执行程序；还需要将调用者的目标文件与静态库一起链接。
+
+请自行学习完成以下内容：
+
+1. 学习 `ar` 命令，查清 `r`、`c`、`s` 各自的作用。重复执行第一条命令时，已有成员会怎样更新？
+2. 用 `build/main.o` 和 `build/libcalc.a` 链接出 `build/calc-demo`，再运行它。应打印 `2 + 3 = 5`，与直接链接两个 `.o` 的结果相同。
+3. 学习 `-L` 和 `-l` 选项，用 `-Lbuild -lcalc` 替换静态库的完整路径，完成同样的链接。两个选项分别有什么用？
+4. 在本例的 GNU 链接环境中，交换 `build/main.o` 和 `build/libcalc.a` 的输入顺序，观察是否还能链接成功。链接器处理静态库时，如何依据尚未解决的符号引用选取成员？
+5. 修改 `src/calc.c` 后，只重新链接已有的 `libcalc.a` 能否得到新实现？还需要更新哪些产物，应按什么顺序执行？
+
+[GNU ar 文档](https://sourceware.org/binutils/docs/binutils/ar.html)可用于查询归档操作及成员管理；[GCC 链接选项文档](https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html)说明库的搜索方式与链接次序。
+
 ## 标准库
 
 1. 示例的 `src/main.c` 中有 `#include <stdio.h>`。为什么不需要指定 `-I` 选项就能找到它？
-2. 理论上头文件 `stdio.h` 也应当对应有一个源文件 `stdio.c`，为什么不需要把它加入编译命令？
-3. `.a` 文件是什么？
+2. `stdio.h` 提供声明后，`printf` 的定义由谁提供？为什么不需要把它的实现源码加入编译命令？
 
 ## 增量构建
 
-上面的学习中，我们了解到两种方案编译构建本项目：
-- 一条命令一次性编译两个源文件并链接成可执行程序。
-- 分别编译两个源文件，得到两个目标文件，再链接成可执行程序。
+比较前面三种构建方案，后续 Makefile 和 CMake 示例采用第三种：
 
-分析对比这两种方案：
-1. 假如我们只修改了 `src/calc.c`，想要重新编译项目。这两种思路的差异在哪里？哪种方案更高效？
-2. 假如我们修改了 `include/calc.h`，想要重新编译项目。两种方案又有什么差异？
-3. 假如我们想指定 `-DCALC_TRACE=1`，让 `calc_add` 输出日志。两种方案又有什么差异？
+1. 一条命令一次性编译两个源文件并链接成可执行程序。
+2. 分别编译两个源文件，得到两个目标文件，再直接链接成可执行程序。
+3. 分别编译两个源文件，将 `calc.o` 归档为 `libcalc.a`，再用 `main.o` 和静态库链接成可执行程序。
+
+分析对比这三种方案：
+
+1. 只修改 `src/calc.c` 后，三种方案分别需要执行哪些步骤？哪些已有产物可以沿用？
+2. 修改公共头文件 `include/calc.h` 后，哪些目标文件需要重新编译？静态库方案还需要更新哪些产物？
+3. 想通过 `-DCALC_TRACE=1` 让 `calc_add` 输出日志，这个选项必须用于哪个源文件的编译？分别编译时，能否沿用未改变编译输入的 `main.o`？采用静态库时，还需要执行哪些步骤？
 
 <br>
 
 **增量构建**根据已有产物和输入变化，只执行需要更新的构建步骤。
 
-如何判断哪些文件需要重新编译？我们可以进行依赖分析。下图展示了本例的依赖关系，箭头从输入指向依赖它的产物：
+如何判断哪些文件需要重新编译？我们可以进行依赖分析。下图展示静态库方案的文件依赖，箭头从输入指向依赖它的产物：
 
 ```mermaid
-flowchart LR
+---
+config:
+  flowchart:
+    useMaxWidth: false
+---
+flowchart TB
     main["<code>src/main.c</code>"] --> maino["<code>build/main.o</code>"]
     header["<code>include/calc.h</code>"] --> maino
     header --> calco["<code>build/calc.o</code>"]
     calc["<code>src/calc.c</code>"] --> calco
-    maino --> app["可执行文件"]
-    calco --> app
+    maino --> app["<code>build/calc-demo</code>"]
+    calco --> lib["<code>build/libcalc.a</code>"]
+    lib --> app
 ```
+
+`calc.o` 更新后，还要更新 `libcalc.a`，再重新链接程序。直接链接两个 `.o` 的方案则省去归档步骤。
 
 头文件也是编译输入。可以让 gcc 列出用户头文件依赖：
 
@@ -111,3 +142,5 @@ gcc -MM -Iinclude src/main.c
 应得到类似 `main.o: src/main.c include/calc.h` 的依赖列表。
 
 更大的工程还有间接包含的头文件，因此只比较 `.c` 的时间戳会漏掉变化。此外，宏定义、编译选项和工具链变化都可能使旧产物失效。依赖分析正确还不够，构建系统需要有相应的更新机制。
+
+进入下一节前，恢复文件树中的源码，按默认日志开关 `CALC_TRACE=0` 重新编译两个 `.o`、更新静态库并链接。运行 `build/calc-demo`，应只打印 `2 + 3 = 5`。

@@ -118,7 +118,12 @@ error: unused variable 'unused' [-Werror=unused-variable]
 本例用下面的模型观察构建：
 
 ```mermaid
-flowchart
+---
+config:
+  flowchart:
+    useMaxWidth: false
+---
+flowchart TB
     c["<code>main.c</code>"] -->|预处理| i["<code>main.i</code>：C 文本"]
     i -->|编译| s["<code>main.s</code>：汇编文本"]
     s -->|汇编| o["<code>main.o</code>：目标文件"]
