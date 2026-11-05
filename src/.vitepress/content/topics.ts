@@ -4,8 +4,6 @@ import type { NodeId } from "./nodes.ts"
 type TopicShape = {
   /** 专题页显示名称。 */
   title: string
-  /** 专题覆盖内容的简述。 */
-  summary: string
   /** 专题包含的节点，顺序用于展示。 */
   members: readonly NodeId[]
 }
@@ -18,7 +16,6 @@ function defineTopics<const Registry extends Record<string, TopicShape>>(registr
 export const topics = defineTopics({
   engineering: {
     title: "工程与协作",
-    summary: "命令行、C/C++ 构建、版本管理与远程协作的工程基础。",
     members: [
       "engineering.shell-basics",
       "engineering.c-cpp-toolchain",
@@ -28,7 +25,6 @@ export const topics = defineTopics({
   },
   embedded: {
     title: "电子与嵌入式",
-    summary: "电路与电平约束，以及 MCU 的基本结构。",
     members: ["embedded.circuit-basics", "embedded.mcu-structure"]
   }
 })

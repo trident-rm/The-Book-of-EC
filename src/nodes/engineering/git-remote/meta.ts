@@ -4,10 +4,6 @@ export default {
   id: "engineering.git-remote",
   title: "Git 远程仓库与 GitHub 协作",
   summary: "连接远程仓库、同步分支，并通过 Fork 和 Pull Request 协作。",
-  level: "intro",
-  estimatedTime: "2h",
-  concepts: ["version-control"],
-  technologies: ["Git", "GitHub"],
   relations: [{ target: "engineering.git-basics", type: "required" }],
   parts: [
     { title: "Introduction", path: "intro.md" },

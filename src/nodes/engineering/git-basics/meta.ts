@@ -4,10 +4,6 @@ export default {
   id: "engineering.git-basics",
   title: "Git 基础",
   summary: "版本管理、仓库、commit 与分支基础。",
-  level: "intro",
-  estimatedTime: "2h",
-  concepts: ["version-control"],
-  technologies: ["Git"],
   relations: [{ target: "engineering.shell-basics", type: "recommended" }],
   parts: [
     { title: "Introduction", path: "intro.md" },

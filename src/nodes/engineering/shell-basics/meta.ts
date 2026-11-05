@@ -4,10 +4,6 @@ export default {
   id: "engineering.shell-basics",
   title: "命令行基础",
   summary: "命令结构、文件导航、工具解析、运行环境、软件安装与包管理。",
-  level: "intro",
-  estimatedTime: "3h",
-  concepts: ["shell", "process", "filesystem", "environment-variable"],
-  technologies: ["Windows", "Linux", "PowerShell", "shell"],
   relations: [],
   parts: [
     { title: "Introduction", path: "intro.md" },

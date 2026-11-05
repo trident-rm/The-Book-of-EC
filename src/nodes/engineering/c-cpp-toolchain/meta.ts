@@ -4,10 +4,6 @@ export default {
   id: "engineering.c-cpp-toolchain",
   title: "C/C++ 工具链与构建流程",
   summary: "标准与实现、编译产物、多文件与静态库，以及 Make、CMake 和增量构建。",
-  level: "core",
-  estimatedTime: "4h",
-  concepts: ["build-system", "compilation", "linking"],
-  technologies: ["C", "C++", "GCC", "Clang", "MSVC", "Make", "CMake", "Ninja", "Linux"],
   relations: [{ target: "engineering.shell-basics", type: "required" }],
   parts: [
     { title: "学习目标与准备", path: "intro.md" },

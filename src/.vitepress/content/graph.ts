@@ -2,7 +2,6 @@ import { existsSync, readdirSync } from "node:fs"
 import { join } from "node:path"
 import type { Plugin } from "vite"
 import { graphNodes, nodeIds, nodes, type NodeId } from "./nodes.ts"
-import { levels } from "./taxonomy.ts"
 import { graphTopics } from "./topics.ts"
 
 /** 返回节点 ID 对应的源文件目录。 */
@@ -92,8 +91,7 @@ export function learningGraphPlugin(source: string): Plugin {
       validateContent(source)
       return `export default ${JSON.stringify({
         nodes: graphNodes(),
-        topics: graphTopics(),
-        taxonomy: { levels }
+        topics: graphTopics()
       })}`
     }
   }

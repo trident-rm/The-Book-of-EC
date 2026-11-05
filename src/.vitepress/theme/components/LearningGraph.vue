@@ -12,11 +12,6 @@ const props = defineProps<{
 }>()
 const canvas = ref<HTMLDivElement | null>(null)
 const query = ref("")
-const selectedLevels = ref<string[]>([])
-const selectedConcepts = ref<string[]>([])
-const selectedTechnologies = ref<string[]>([])
-const conceptInput = ref("")
-const technologyInput = ref("")
 const selectedId = ref<string | null>(null)
 const isExpanded = ref(false)
 const normalMinZoom = 0.58
@@ -28,13 +23,6 @@ let wheelCanvas: HTMLDivElement | undefined
 let wheelSource: "mouse" | "trackpad" | undefined
 let wheelGestureResetTimer: ReturnType<typeof setTimeout> | undefined
 
-const levelLabels: Record<string, string> = {
-  intro: "入门",
-  core: "核心",
-  advanced: "进阶",
-  integration: "综合"
-}
-
 const allNodes = graph.nodes
 const byId = new Map(allNodes.map((node) => [node.id, node]))
 const topic = computed(() =>
@@ -45,30 +33,11 @@ const memberNodes = computed(() => {
   const ids = new Set(topic.value.members)
   return allNodes.filter((node) => ids.has(node.id))
 })
-const allConcepts = computed(() =>
-  [...new Set(memberNodes.value.flatMap((node) => node.concepts))].sort()
-)
-const allTechnologies = computed(() =>
-  [...new Set(memberNodes.value.flatMap((node) => node.technologies))].sort()
-)
-
-/** 未选择筛选值时视为匹配全部，否则匹配任意一个值。 */
-function includesAny(values: string[], selected: string[]) {
-  return selected.length === 0 || selected.some((value) => values.includes(value))
-}
-
 const visibleMembers = computed(() => {
   const needle = query.value.trim().toLowerCase()
   return memberNodes.value.filter((node) => {
-    const searchable = [node.id, node.title, node.summary, ...node.concepts, ...node.technologies]
-      .join(" ")
-      .toLowerCase()
-    return (
-      (!needle || searchable.includes(needle)) &&
-      (selectedLevels.value.length === 0 || selectedLevels.value.includes(node.level)) &&
-      includesAny(node.concepts, selectedConcepts.value) &&
-      includesAny(node.technologies, selectedTechnologies.value)
-    )
+    const searchable = [node.id, node.title, node.summary].join(" ").toLowerCase()
+    return !needle || searchable.includes(needle)
   })
 })
 
@@ -104,32 +73,8 @@ const selectedFollowers = computed(() =>
     : []
 )
 
-function toggleLevel(level: string) {
-  selectedLevels.value = selectedLevels.value.includes(level)
-    ? selectedLevels.value.filter((item) => item !== level)
-    : [...selectedLevels.value, level]
-}
-
-function addFilter(kind: "concept" | "technology") {
-  const input = kind === "concept" ? conceptInput : technologyInput
-  const selectedValues = kind === "concept" ? selectedConcepts : selectedTechnologies
-  if (input.value && !selectedValues.value.includes(input.value)) {
-    selectedValues.value = [...selectedValues.value, input.value]
-  }
-  input.value = ""
-}
-
-function removeFilter(kind: "concept" | "technology", value: string) {
-  if (kind === "concept")
-    selectedConcepts.value = selectedConcepts.value.filter((item) => item !== value)
-  else selectedTechnologies.value = selectedTechnologies.value.filter((item) => item !== value)
-}
-
-function resetFilters() {
+function clearSearch() {
   query.value = ""
-  selectedLevels.value = []
-  selectedConcepts.value = []
-  selectedTechnologies.value = []
 }
 
 /** 打开节点入口页。 */
@@ -175,7 +120,7 @@ function focusNode(id: string) {
     if (node) window.location.assign(withBase(node.route))
     return
   }
-  if (!visibleIds.value.has(id)) resetFilters()
+  if (!visibleIds.value.has(id)) clearSearch()
   selectedId.value = id
 }
 
@@ -217,7 +162,6 @@ function graphElements(): ElementDefinition[] {
     data: {
       id: node.id,
       label: node.title,
-      level: node.level,
       context: contextIds.value.has(node.id) ? "external" : "member"
     }
   }))
@@ -311,26 +255,10 @@ onMounted(async () => {
           color: "#243147",
           "text-valign": "center",
           "text-halign": "center",
-          "background-color": "#f6f7f9",
+          "background-color": "#eaf5f1",
           "border-width": 1,
-          "border-color": "#d9dde5"
+          "border-color": "#a9d3c7"
         }
-      },
-      {
-        selector: 'node[level = "intro"]',
-        style: { "background-color": "#eaf5f1", "border-color": "#a9d3c7" }
-      },
-      {
-        selector: 'node[level = "core"]',
-        style: { "background-color": "#eef3fb", "border-color": "#aec4e6" }
-      },
-      {
-        selector: 'node[level = "advanced"]',
-        style: { "background-color": "#f4effb", "border-color": "#c7b7e4" }
-      },
-      {
-        selector: 'node[level = "integration"]',
-        style: { "background-color": "#fff5e5", "border-color": "#e9c989" }
       },
       {
         selector: 'node[context = "external"]',
@@ -393,66 +321,13 @@ onBeforeUnmount(() => {
     aria-label="学习节点依赖图"
   >
     <div class="graph-controls">
-      <input
-        v-model="query"
-        type="search"
-        placeholder="搜索节点、概念或技术"
-        aria-label="搜索学习节点"
-      />
-      <div class="graph-filter-row graph-selects">
-        <span>层级</span>
-        <button
-          v-for="level in graph.taxonomy.levels"
-          :key="level"
-          :class="{ active: selectedLevels.includes(level) }"
-          type="button"
-          @click="toggleLevel(level)"
-        >
-          {{ levelLabels[level] }}
-        </button>
-        <label>
-          <span>概念</span>
-          <select v-model="conceptInput" @change="addFilter('concept')">
-            <option value="">添加概念筛选</option>
-            <option v-for="concept in allConcepts" :key="concept" :value="concept">
-              {{ concept }}
-            </option>
-          </select>
-        </label>
-        <label>
-          <span>技术</span>
-          <select v-model="technologyInput" @change="addFilter('technology')">
-            <option value="">添加技术筛选</option>
-            <option v-for="technology in allTechnologies" :key="technology" :value="technology">
-              {{ technology }}
-            </option>
-          </select>
-        </label>
-      </div>
-      <div v-if="selectedConcepts.length || selectedTechnologies.length" class="selected-filters">
-        <button
-          v-for="concept in selectedConcepts"
-          :key="concept"
-          type="button"
-          @click="removeFilter('concept', concept)"
-        >
-          概念：{{ concept }} ×
-        </button>
-        <button
-          v-for="technology in selectedTechnologies"
-          :key="technology"
-          type="button"
-          @click="removeFilter('technology', technology)"
-        >
-          技术：{{ technology }} ×
-        </button>
-      </div>
+      <input v-model="query" type="search" placeholder="搜索学习节点" aria-label="搜索学习节点" />
     </div>
 
     <div class="graph-canvas-wrap">
       <div ref="canvas" class="cy-canvas" role="application" aria-label="可交互学习节点依赖图" />
       <div class="graph-canvas-actions" aria-label="图操作">
-        <button type="button" aria-label="重置筛选" title="重置筛选" @click="resetFilters">
+        <button type="button" aria-label="清空搜索" title="清空搜索" @click="clearSearch">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M19 8a8 8 0 1 0 1.5 7M19 4v4h-4" />
           </svg>
@@ -493,20 +368,9 @@ onBeforeUnmount(() => {
           ×
         </button>
         <div class="node-drawer-summary">
-          <p class="modal-level">{{ levelLabels[selected.level] }}</p>
           <h2>{{ selected.title }}</h2>
           <p>{{ selected.summary }}</p>
         </div>
-        <dl class="node-drawer-meta">
-          <div>
-            <dt>概念</dt>
-            <dd>{{ selected.concepts.join(" · ") }}</dd>
-          </div>
-          <div>
-            <dt>技术</dt>
-            <dd>{{ selected.technologies.join(" · ") }}</dd>
-          </div>
-        </dl>
         <div class="node-drawer-relations">
           <section v-if="selectedPrerequisites.length">
             <h3>直接先修</h3>

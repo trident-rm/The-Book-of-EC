@@ -16,9 +16,6 @@ next: false
 
 - `title`、`summary`：图中展示的名称和摘要。
 - `id`：与所在节点目录对应的固定 ID。
-- `level`：`intro`、`core`、`advanced` 或 `integration`。
-- `estimatedTime`：完成节点的大致时间。
-- `concepts`、`technologies`：图内筛选使用的固定标签。
 - `relations`：指向必需或建议先修节点。
 - `parts`：节点全部页面的标题、Markdown 文件路径与线性顺序；首项为入口页，路径包含 `.md` 扩展名。
 
@@ -28,4 +25,4 @@ next: false
 
 ## 构建验证
 
-中央注册表静态导入全部 `meta.ts`，因此不需要额外的元数据生成命令。TypeScript 负责检查 ID、标签、字段取值和 Markdown 路径扩展名；构建阶段继续检查 `NodeId` 与元数据目录是否一致、已登记页面是否存在、重复页面、重复专题成员和必需依赖环。
+中央注册表静态导入全部 `meta.ts`，因此不需要额外的元数据生成命令。TypeScript 负责检查 ID、字段取值和 Markdown 路径扩展名；构建阶段继续检查 `NodeId` 与元数据目录是否一致、已登记页面是否存在、重复页面、重复专题成员和必需依赖环。

@@ -4,7 +4,6 @@ import engineeringCCppToolchain from "#nodes/engineering/c-cpp-toolchain/meta.ts
 import engineeringGitBasics from "#nodes/engineering/git-basics/meta.ts"
 import engineeringGitRemote from "#nodes/engineering/git-remote/meta.ts"
 import engineeringShellBasics from "#nodes/engineering/shell-basics/meta.ts"
-import type { Concept, Level, Technology } from "./taxonomy.ts"
 
 /** 全部合法节点 ID。 */
 export const nodeIds = [
@@ -41,14 +40,6 @@ export type NodeDefinition = {
   title: string
   /** 节点学习目标的简述。 */
   summary: string
-  /** 建议学习阶段。 */
-  level: Level
-  /** 完成节点的大致用时。 */
-  estimatedTime: string
-  /** 节点覆盖的概念。 */
-  concepts: readonly Concept[]
-  /** 节点涉及的技术。 */
-  technologies: readonly Technology[]
   /** 指向直接先修节点的关系。 */
   relations: readonly {
     /** 先修节点 ID。 */
