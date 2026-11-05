@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { makeFiles, cmakeFiles } from "./example-files.ts"
+import { makeFiles, cmakeFiles, commandRunnerFiles } from "./example-files.ts"
 </script>
 
 # 构建系统：Makefile、CMake
@@ -262,35 +262,50 @@ cmake --build build-ninja
 
 CMake 这次生成 `build.ninja`，由 Ninja 执行。Ninja 还把命令变化纳入重建判定，但依赖仍需要准确描述。
 
-## 自主实验
+## 命令运行器
 
-沿用 [CMakeLists.txt](#cmakelists-txt) 一节中的四个文件，在 `calc-demo/` 根目录继续修改，依次完成以下三个任务。
+CMake 的配置命令包含生成器、构建目录和选项，重复输入比较繁琐。有没有办法可以简化呢？
 
-### 任务一：用 Makefile 统一命令入口
+沿用 [CMakeLists.txt](#cmakelists-txt) 一节中的四个文件，在工程根目录加入下面的新 `Makefile`：
 
-CMake 的配置命令包含生成器、构建目录和选项，完整输入比较繁琐。有没有方法能简化输入命令呢？
+<CodeTree title="calc-demo · 命令运行器" :files="commandRunnerFiles" initial-file="Makefile" :initialSidebarExpanded="false">
+<template #header>
 
-在工程根目录编写一份新的 `Makefile`，将它作为**命令运行器**，实现以下入口：
+<<< ./assets/calc-demo/include/calc.h{c}
 
-| 命令                  | 要求                                                                                 |
+</template>
+<template #calc>
+
+<<< ./assets/calc-demo/src/calc.c{c}
+
+</template>
+<template #main>
+
+<<< ./assets/calc-demo/src/main.c{c}
+
+</template>
+<template #cmake>
+
+<<< ./assets/calc-demo/cmake-lists.txt{cmake}
+
+</template>
+<template #makefile>
+
+<<< ./assets/calc-demo/command-runner-makefile{makefile}
+
+</template>
+</CodeTree>
+
+
+| 命令                  | 作用                                                                                 |
 | --------------------- | ------------------------------------------------------------------------------------ |
-| `make` / `make build` | 配置并构建 Debug；使用 GCC、`Unix Makefiles`、`build-debug/`，并设置 `CALC_TRACE=ON` |
+| `make build` / `make` | 配置并构建 Debug；使用 GCC、`Unix Makefiles`、`build-debug/`，并设置 `CALC_TRACE=ON` |
 | `make run`            | 先完成上述构建，再运行 `build-debug/calc-demo`                                       |
 | `make clean`          | 删除 `build-debug/`，包括其中的缓存、生成规则和编译产物；目录不存在时也能成功        |
 
-这时工程中几份文件的职责不同：
+本页开头的手写 Makefile 直接记录 `.c`、`.o`、静态库和程序的依赖；这里的根目录 Makefile 只编排任务。外层 Make 执行任务命令，CMake 读取 `CMakeLists.txt` 并生成构建规则，`cmake --build` 再在构建目录中调用 Make。源码依赖交给 CMake 及其生成的规则管理。
 
-| 文件                    | 谁维护     | 职责                                 |
-| ----------------------- | ---------- | ------------------------------------ |
-| 根目录 `Makefile`       | 你         | 编排配置、构建、运行、清理等命令     |
-| 根目录 `CMakeLists.txt` | 你         | 描述源码、目标、依赖和构建要求       |
-| `build-debug/Makefile`  | CMake 生成 | 提供后端执行的构建规则，跟踪文件依赖 |
-
-外层 Make 执行任务命令，CMake 读取 `CMakeLists.txt` 并生成构建规则，`cmake --build` 再在构建目录中调用 Make。源码依赖继续交给 CMake 及其生成的规则管理。
-
-**提示：**把任务目标声明为 `.PHONY`；让 `run` 依赖 `build`，复用构建任务。`build` 每次先配置，再用 `cmake --build build-debug --verbose` 构建，便于查看实际命令。外层任务每次执行，不代表内部需要重新编译所有源码。[GNU Make 伪目标文档](https://www.gnu.org/software/make/manual/html_node/Phony-Targets.html)可用于核对这些任务的执行规则。
-
-**验收：**依次执行：
+依次体验这些入口：
 
 ```sh
 make clean
@@ -300,11 +315,15 @@ make run
 make clean
 ```
 
-第一次 `make` 应创建 `build-debug/` 并生成程序。后续输入未变时，配置和构建命令仍会执行，但不应重新编译 `.c`；运行应先输出加法日志，再打印 `2 + 3 = 5`。最后一次清理应删除整个 `build-debug/`，保留源码和根目录的两份构建描述文件。
+除了 Makefile，也可以用 shell 脚本或其他语言实现类似的命令运行器。
 
-### 任务二：为静态库增加功能
+## 自主实验
 
-在任务一的工程上增加减法功能：
+沿用[命令运行器示例](#命令运行器)中的五文件项目，在 `calc-demo/` 根目录继续修改，依次完成以下两个任务。
+
+### 任务一：为静态库增加功能
+
+为示例工程增加减法功能：
 
 1. 新建 `src/subtract.c`，定义 `int calc_subtract(int a, int b)`，返回 `a - b`。
 2. 在 `calc.h` 中声明该函数，在 `main.c` 中调用并打印 `5 - 2 = 3`。
@@ -313,7 +332,7 @@ make clean
 
 **验收：**程序应保留加法日志和结果，增加减法结果。执行 `ar t build-debug/libcalc.a`，应能找到新加入的 `subtract.c.o`。再解释：为什么 `main.c` 能找到 `calc.h`，为什么它不需要直接知道 `libcalc.a` 的磁盘路径，以及日志宏为什么只加在 `calc` 上。
 
-### 任务三：区分 Debug 与 Release 构建
+### 任务二：区分 Debug 与 Release 构建
 
 实际工程通常为同一份源码保留不同的构建配置：Debug 方便定位问题，Release 侧重优化后的运行表现。它们已经是 CMake 的标准配置；本任务要完善的是本工程的日志策略和命令入口。
 

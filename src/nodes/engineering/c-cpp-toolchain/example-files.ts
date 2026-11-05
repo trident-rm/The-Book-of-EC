@@ -15,3 +15,8 @@ export const cmakeFiles = [
   ...sourceFiles,
   { path: "CMakeLists.txt", slot: "cmake" }
 ] satisfies readonly CodeTreeFile[]
+
+export const commandRunnerFiles = [
+  ...cmakeFiles,
+  { path: "Makefile", slot: "makefile" }
+] satisfies readonly CodeTreeFile[]

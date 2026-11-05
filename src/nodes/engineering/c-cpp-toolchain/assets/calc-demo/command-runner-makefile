@@ -1,0 +1,14 @@
+build:
+	cmake -S . -B build-debug -G "Unix Makefiles" \
+		-DCMAKE_C_COMPILER=gcc \
+		-DCMAKE_BUILD_TYPE=Debug \
+		-DCALC_TRACE=ON
+	cmake --build build-debug --verbose
+
+run: build
+	./build-debug/calc-demo
+
+clean:
+	rm -rf build-debug
+
+.PHONY: build run clean
