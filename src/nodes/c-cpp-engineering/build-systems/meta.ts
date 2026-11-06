@@ -9,6 +9,7 @@ export default {
     { title: "学习目标与准备", path: "intro.md" },
     { title: "Makefile：记录依赖和命令", path: "make.md" },
     { title: "CMake：用目标描述工程", path: "cmake.md" },
+    { title: "Makefile 用作命令运行器", path: "command-runner.md" },
     { title: "自主实验", path: "exercises.md" }
   ]
 } satisfies NodeDefinition
