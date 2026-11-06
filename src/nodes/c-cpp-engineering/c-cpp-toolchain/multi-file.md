@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { sourceFiles } from "./example-files.ts"
+import { sourceFiles } from "../_shared/example-files.ts"
 </script>
 
 # 多文件构建
@@ -13,17 +13,17 @@ import { sourceFiles } from "./example-files.ts"
 <CodeTree title="calc-demo" :files="sourceFiles" initial-file="src/main.c">
 <template #header>
 
-<<< ./assets/calc-demo/include/calc.h{c}
+<<< ../_shared/assets/calc-demo/include/calc.h{c}
 
 </template>
 <template #calc>
 
-<<< ./assets/calc-demo/src/calc.c{c}
+<<< ../_shared/assets/calc-demo/src/calc.c{c}
 
 </template>
 <template #main>
 
-<<< ./assets/calc-demo/src/main.c{c}
+<<< ../_shared/assets/calc-demo/src/main.c{c}
 
 </template>
 </CodeTree>
@@ -136,7 +136,7 @@ Windows 使用 DLL 时，链接阶段常配合一份**导入库（import library
 
 ## 增量构建
 
-比较前面三种构建方案，后续 Makefile 和 CMake 示例采用第三种：
+比较前面三种构建方案，[构建系统](../build-systems/intro.md)节点中的 Makefile 和 CMake 示例采用第三种：
 
 1. 一条命令一次性编译两个源文件并链接成可执行程序。
 2. 分别编译两个源文件，得到两个目标文件，再直接链接成可执行程序。
@@ -182,7 +182,7 @@ gcc -MM -Iinclude src/main.c
 
 更大的工程还有间接包含的头文件，因此只比较 `.c` 的时间戳会漏掉变化。此外，宏定义、编译选项和工具链变化都可能使旧产物失效。依赖分析正确还不够，构建系统需要有相应的更新机制。
 
-进入下一节前，恢复文件树中的源码，按默认日志开关 `CALC_TRACE=0` 重新编译两个 `.o`、更新静态库并链接。运行 `build/calc-demo`，应只打印 `2 + 3 = 5`。
+完成本页实验后，恢复文件树中的源码，按默认日志开关 `CALC_TRACE=0` 重新编译两个 `.o`、更新静态库并链接。运行 `build/calc-demo`，应只打印 `2 + 3 = 5`。
 
 ## 思考
 

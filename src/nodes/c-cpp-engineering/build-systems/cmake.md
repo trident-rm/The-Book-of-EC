@@ -1,129 +1,8 @@
 <script setup lang="ts">
-import { makeFiles, cmakeFiles, presetFiles, commandRunnerFiles } from "./example-files.ts"
+import { cmakeFiles, presetFiles, commandRunnerFiles } from "./example-files.ts"
 </script>
 
-# 构建系统：Makefile、CMake
-
-## Makefile：记录依赖和命令
-
-上一节中，每次修改都要求手动判断要执行哪些命令。命令又长又难记，依赖分析也容易出错。GNU Make 是一种构建工具，它将构建过程写成规则，帮我们自动完成分析和命令执行。
-
-基本语法如下：
-
-```makefile
-目标: 前置依赖
-	生成或更新目标的命令
-```
-
-目标文件不存在，或某个前置文件比它更新时，Make 会执行对应命令，并沿依赖关系更新后续目标。
-
-本节沿用上一节的静态库方案，Make 的产物放在 `build-make/`，与手动构建的 `build/` 分开。在工程根目录新建 `Makefile`，从文件树中复制它的完整内容；其他三个文件沿用上一节的源码：
-
-<CodeTree title="calc-demo · Make" :files="makeFiles" initial-file="Makefile" :initialSidebarExpanded="false">
-<template #header>
-
-<<< ./assets/calc-demo/include/calc.h{c}
-
-</template>
-<template #calc>
-
-<<< ./assets/calc-demo/src/calc.c{c}
-
-</template>
-<template #main>
-
-<<< ./assets/calc-demo/src/main.c{c}
-
-</template>
-<template #makefile>
-
-<<< ./assets/calc-demo/makefile{makefile}
-
-</template>
-</CodeTree>
-
-这份文件中：
-
-1. `all` 是默认目标，最终要求生成 `build-make/calc-demo`。
-2. 两个 `.o` 都依赖各自的 `.c` 和公共头文件；静态库依赖 `calc.o`，程序依赖 `main.o` 与静态库。
-3. 规则下方就是上一节手动执行过的编译、归档和链接命令。
-
-`$(CC)` 等写法引用 Make 变量。这里用 `CPPFLAGS` 保存预处理选项，用 `CFLAGS` 保存 C 编译选项；变量只有被命令引用后才起作用。`| build-make` 要求目录先存在，同时避免因目录时间戳变化而触发重编译。`.PHONY: all clean` 将两者声明为任务目标，避免同名文件影响执行。
-
-第一次构建并运行：
-
-```sh
-make
-./build-make/calc-demo
-```
-
-应看到两次编译、一次归档和一次链接，程序打印 `2 + 3 = 5`。再执行 `make`，应提示无需更新，且没有新的编译命令。
-
-### 观察增量构建
-
-用 `touch` 只更新时间戳，模拟输入文件发生变化：
-
-```sh
-touch src/main.c
-make -n
-make
-```
-
-`make -n` 预览本例将执行的命令。应只重新编译 `main.o`、重新链接程序，`calc.o` 与静态库沿用。
-
-接着更新库实现的时间戳：
-
-```sh
-touch src/calc.c
-make
-```
-
-应只重新编译 `calc.o`，更新 `libcalc.a` 并重新链接程序，`main.o` 沿用。这对应上一节依赖图中的 `calc.o → libcalc.a → 程序` 分支。
-
-再修改公共头文件的时间戳：
-
-```sh
-touch include/calc.h
-make
-```
-
-应重新编译两个 `.o`、更新归档并链接。即使头文件内容没有变化，时间戳依赖规则仍会要求重建。这说明 Make 依据声明的规则和文件时间判断更新，不分析 C 代码的语义。
-
-本例直接列出头文件。工程扩大后，可以通过编译器生成依赖列表，例如用 GCC 的 `-MMD` 记录用户头文件依赖，再交给 Make 读取。
-
-### 改了编译选项，也要使旧产物失效
-
-对上面已经完成的构建执行：
-
-```sh
-make CPPFLAGS='-Iinclude -DCALC_TRACE=1'
-./build-make/calc-demo
-```
-
-这份 Makefile 没有把编译命令变化登记为更新条件，普通 Make 也不会自动比较前后两次命令。其他输入未变时，本例不会重新编译，输出仍只有 `2 + 3 = 5`。
-
-本例可以显式强制重建：
-
-```sh
-make -B CPPFLAGS='-Iinclude -DCALC_TRACE=1'
-./build-make/calc-demo
-```
-
-本例的 `CPPFLAGS` 用于两个源码的编译，`-B` 会强制重新编译两个 `.o`、更新归档并链接。运行时应先输出日志，再输出计算结果。切回默认开关时也需要重建。实际工程可以用配置文件依赖、独立构建目录或其他机制管理配置变化；正确的增量构建不能只考虑 `.c` 文件。
-
-### 清理构建产物
-
-需要从头构建时，也可以先清理再构建：
-
-```sh
-make clean
-make
-./build-make/calc-demo
-```
-
-`clean` 目标执行 `rm -rf build-make`，删除本例的 Make 构建产物。下次 `make` 应重新创建目录，完成两次编译、一次归档和一次链接。
-
-## CMake：用目标描述工程
+# CMake：用目标描述工程
 
 Makefile 可以用模式规则、自动依赖等机制管理更大的工程，但仍需维护源文件、编译要求、库依赖和相应规则。CMake 提供更高一层的描述：有哪些可执行程序和库，各自使用什么源码，又依赖谁。
 
@@ -139,24 +18,24 @@ Makefile 可以用模式规则、自动依赖等机制管理更大的工程，�
 | 生成器（generator） | 选择生成哪种构建系统，如 `Unix Makefiles`、`Ninja`           |
 | 缓存变量            | 在构建目录的 `CMakeCache.txt` 中保存配置，后续配置时继续使用 |
 
-### CMakeLists.txt
+## CMakeLists.txt
 
 本例只需要三个源码／头文件和 `CMakeLists.txt`。在工程根目录新建 `CMakeLists.txt`：
 
 <CodeTree title="calc-demo · CMake" :files="cmakeFiles" initial-file="CMakeLists.txt" :initialSidebarExpanded="false">
 <template #header>
 
-<<< ./assets/calc-demo/include/calc.h{c}
+<<< ../_shared/assets/calc-demo/include/calc.h{c}
 
 </template>
 <template #calc>
 
-<<< ./assets/calc-demo/src/calc.c{c}
+<<< ../_shared/assets/calc-demo/src/calc.c{c}
 
 </template>
 <template #main>
 
-<<< ./assets/calc-demo/src/main.c{c}
+<<< ../_shared/assets/calc-demo/src/main.c{c}
 
 </template>
 <template #cmake>
@@ -185,7 +64,7 @@ Makefile 可以用模式规则、自动依赖等机制管理更大的工程，�
 
 `${CMAKE_CURRENT_SOURCE_DIR}` 展开为当前 `CMakeLists.txt` 所在的源码目录。本例据此构造头文件目录的绝对路径，使它不依赖运行编译器时的工作目录。
 
-### PRIVATE、PUBLIC 与 INTERFACE
+## PRIVATE、PUBLIC 与 INTERFACE
 
 头文件目录、宏定义等属性不仅影响目标自身，还可能成为使用该目标时需要的条件，即**使用要求（usage requirements）**。
 
@@ -203,7 +82,7 @@ Makefile 可以用模式规则、自动依赖等机制管理更大的工程，�
 
 `target_link_libraries(calc-demo PRIVATE calc)` 指定依赖目标，CMake 会安排所需的库构建和链接输入。
 
-### 配置、生成与构建
+## 配置、生成与构建
 
 选择 `Unix Makefiles` 生成器后，CMake 会在 `build-cmake/` 中生成自己的 Makefile，无需上一节手写的 Makefile。先配置并生成，再构建、运行：
 
@@ -226,7 +105,7 @@ cmake --build build-cmake --verbose
 
 `-S`、`-B`、`-G` 和构建模式的具体用途可查 [CMake 命令行文档](https://cmake.org/cmake/help/latest/manual/cmake.1.html)。
 
-### 从 CMake 选项到 C 宏
+## 从 CMake 选项到 C 宏
 
 重新配置同一个构建目录：
 
@@ -249,7 +128,7 @@ cmake --build build-cmake --verbose
 
 CMake 还会为这些 C 文件安排头文件依赖追踪。可以分别 `touch src/main.c`、`touch src/calc.c` 或 `touch include/calc.h`，每次更新后都执行构建，并且只更新受影响的目标。
 
-### CMake Preset
+## CMake Preset
 
 **Preset（预设）**将一组 CMake 配置或构建选项保存到文件中，供命令按名称使用。`CMakeLists.txt` 描述工程中的目标与要求；预设记录所选的生成器、构建目录、缓存变量等，免去重复输入长命令。
 
@@ -258,17 +137,17 @@ CMake 还会为这些 C 文件安排头文件依赖追踪。可以分别 `touch 
 <CodeTree title="calc-demo · CMake Preset" :files="presetFiles" initial-file="CMakePresets.json" :initialSidebarExpanded="false">
 <template #header>
 
-<<< ./assets/calc-demo/include/calc.h{c}
+<<< ../_shared/assets/calc-demo/include/calc.h{c}
 
 </template>
 <template #calc>
 
-<<< ./assets/calc-demo/src/calc.c{c}
+<<< ../_shared/assets/calc-demo/src/calc.c{c}
 
 </template>
 <template #main>
 
-<<< ./assets/calc-demo/src/main.c{c}
+<<< ../_shared/assets/calc-demo/src/main.c{c}
 
 </template>
 <template #cmake>
@@ -328,22 +207,22 @@ CMake 这次生成 `build.ninja`，由 Ninja 执行。Ninja 还把命令变化�
 
 Preset 保存了 CMake 选项，配置、构建、运行仍需要多条命令。命令运行器可以把这些操作编排成固定任务，并提供清理入口。
 
-沿用 [CMake Preset](#cmake-preset) 一节中的五个文件，在工程根目录加入下面的新 `Makefile`：
+沿用 [CMake Preset](#cmake-preset) 一节中的五个文件，将工程根目录的 `Makefile` 写成下面的内容：
 
 <CodeTree title="calc-demo · 命令运行器" :files="commandRunnerFiles" initial-file="Makefile" :initialSidebarExpanded="false">
 <template #header>
 
-<<< ./assets/calc-demo/include/calc.h{c}
+<<< ../_shared/assets/calc-demo/include/calc.h{c}
 
 </template>
 <template #calc>
 
-<<< ./assets/calc-demo/src/calc.c{c}
+<<< ../_shared/assets/calc-demo/src/calc.c{c}
 
 </template>
 <template #main>
 
-<<< ./assets/calc-demo/src/main.c{c}
+<<< ../_shared/assets/calc-demo/src/main.c{c}
 
 </template>
 <template #cmake>
@@ -369,7 +248,7 @@ Preset 保存了 CMake 选项，配置、构建、运行仍需要多条命令。
 | `make run`            | 先完成上述构建，再运行 `build-debug/calc-demo`                                |
 | `make clean`          | 删除 `build-debug/`，包括其中的缓存、生成规则和编译产物；目录不存在时也能成功 |
 
-本页开头的手写 Makefile 直接记录 `.c`、`.o`、静态库和程序的依赖；这里的根目录 Makefile 只编排任务。外层 Make 执行任务命令，CMake 按预设选择配置，读取 `CMakeLists.txt` 并生成构建规则，`cmake --build` 再在构建目录中调用 Make。源码依赖交给 CMake 及其生成的规则管理。
+[前一页的手写 Makefile](make.md) 直接记录 `.c`、`.o`、静态库和程序的依赖；这里的根目录 Makefile 只编排任务。外层 Make 执行任务命令，CMake 按预设选择配置，读取 `CMakeLists.txt` 并生成构建规则，`cmake --build` 再在构建目录中调用 Make。源码依赖交给 CMake 及其生成的规则管理。
 
 依次体验这些入口：
 
@@ -382,66 +261,3 @@ make clean
 ```
 
 除了 Makefile，也可以用 shell 脚本或其他语言实现类似的命令运行器。
-
-## 自主实验
-
-沿用[命令运行器示例](#命令运行器)中的六文件项目，在 `calc-demo/` 根目录继续修改，依次完成以下两个任务。
-
-### 任务一：为静态库增加功能
-
-为示例工程增加减法功能：
-
-1. 新建 `src/subtract.c`，定义 `int calc_subtract(int a, int b)`，返回 `a - b`。
-2. 在 `calc.h` 中声明该函数，在 `main.c` 中调用并打印 `5 - 2 = 3`。
-3. 将新源码加入 `add_library(calc STATIC ...)` 的列表；也可以用 `target_sources(calc PRIVATE src/subtract.c)` 追加。
-4. 通过 `make run` 完成配置、构建和运行，根目录 Makefile 无需登记新源码。
-
-**验收：**程序应保留加法日志和结果，增加减法结果。执行 `ar t build-debug/libcalc.a`，应能找到新加入的 `subtract.c.o`。再解释：为什么 `main.c` 能找到 `calc.h`，为什么它不需要直接知道 `libcalc.a` 的磁盘路径，以及日志宏为什么只加在 `calc` 上。
-
-### 任务二：区分 Debug 与 Release 构建
-
-实际工程通常为同一份源码保留不同的构建配置：Debug 方便定位问题，Release 侧重优化后的运行表现。它们已经是 CMake 的标准配置；本任务要完善的是本工程的日志策略、Release 预设和命令入口。
-
-在本章使用的 Linux、GCC 环境中，未额外改动编译选项时，CMake 通常采用以下默认值：
-
-| 配置      | 典型默认编译选项     | 对读者的影响                                                                                                                 |
-| --------- | -------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `Debug`   | `-g`；默认未启用优化 | 保留调试信息，便于设置断点、单步执行和查看变量                                                                               |
-| `Release` | `-O3 -DNDEBUG`       | 启用较高等级优化；定义 `NDEBUG`，使标准断言宏 [`assert`](https://www.man7.org/linux/man-pages/man3/assert.3.html) 不执行检查 |
-
-优化可能使代码重排、内联，导致单步顺序或变量显示与源码不完全对应。具体选项可以被工具链、环境和工程设置改变，应查看实际命令；Release 也可以另行启用调试信息。上述默认值可在 [CMake 的 GNU 编译器模块](https://github.com/Kitware/CMake/blob/v3.28.6/Modules/Compiler/GNU.cmake)中核对。
-
-完成以下修改：
-
-1. 修改 `CMakeLists.txt` 中添加日志宏的条件：Debug 下尊重 `CALC_TRACE` 开关，Release 下始终不启用日志，即使调用者指定了 `CALC_TRACE=ON`。可结合 `CMAKE_BUILD_TYPE`、`CALC_TRACE` 和 `if()` 判断；本实验统一使用表中的配置名拼写。
-2. 在 `CMakePresets.json` 中增加名为 `release` 的配置预设：沿用 GCC 和 `Unix Makefiles`，将 `CMAKE_BUILD_TYPE` 设为 `Release`、`CALC_TRACE` 设为 `OFF`，使用独立的 `build-release/`。再增加同名构建预设，通过 `configurePreset` 关联它，并保留详细输出。原有 `debug` 预设仍默认开启日志。
-3. 为根目录 Makefile 增加 `make release` 和 `make run-release`：前者依次执行 `release` 配置预设和构建预设，后者先构建再运行 `build-release/calc-demo`。
-4. 让 `make clean` 同时删除 `build-debug/`、`build-release/`。保持两套目录独立，便于对照缓存、命令和产物。
-
-**提示：**日志开关是本工程的策略，CMake 不会因为选择 Release 自动关闭自定义的 trace。保留现有警告选项，让构建配置提供调试、优化选项；若在 `target_compile_options()` 中对所有配置追加 `-O0`，会覆盖 Release 的优化设置。
-
-**验收：**先清理，再分别构建并运行两种配置：
-
-```sh
-make clean
-make run
-make run-release
-```
-
-两者都应打印加法和减法结果，只有 Debug 输出加法日志。查看首次构建的详细命令：Debug 应带调试信息选项，Release 应带优化选项和 `NDEBUG` 宏。
-
-再直接使用预设，并用命令行 `-D` 覆盖其中的日志选项，检验 `CMakeLists.txt` 中的日志规则：
-
-```sh
-cmake --preset debug -DCALC_TRACE=OFF
-cmake --build --preset debug
-./build-debug/calc-demo
-
-cmake --preset release -DCALC_TRACE=ON
-cmake --build --preset release
-./build-release/calc-demo
-```
-
-这两次运行都应只打印计算结果，没有 trace。前者验证 Debug 可以关闭日志；后者验证 Release 的限制由 `CMakeLists.txt` 保证，而不只依赖预设传入的选项。
-
-命令行的 `-D` 覆盖本次配置时预设提供的值，并写入对应构建目录的缓存。下次不带覆盖参数使用该配置预设时，会重新应用预设中明确声明的缓存值。

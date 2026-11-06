@@ -20,11 +20,11 @@ export const topics = defineTopics({
   },
   "c-cpp-engineering": {
     title: "C/C++ 工程",
-    members: ["c-cpp-engineering.c-cpp-toolchain"]
+    members: ["c-cpp-engineering.c-cpp-toolchain", "c-cpp-engineering.build-systems"]
   },
   embedded: {
     title: "电子与嵌入式",
-    members: ["embedded.circuit-basics", "embedded.mcu-structure"]
+    members: ["embedded.circuit-basics", "embedded.mcu-structure", "embedded.stm32-toolchains"]
   }
 })
 

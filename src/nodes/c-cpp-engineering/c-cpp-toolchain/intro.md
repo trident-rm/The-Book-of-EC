@@ -1,6 +1,6 @@
 # C/C++ 工具链与构建流程
 
-C/C++ 源文件要经过编译、链接才能成为可执行程序。在工程项目中，源文件通常分布在多个目录，编译和链接的命令也非常复杂，因此需要构建系统来管理这些命令。
+本节点学习 C/C++ 程序如何从源码生成可执行文件：区分标准与实现，查看编译产物，手动完成多文件编译、静态库归档和链接，并识别交叉编译的构建平台与目标平台。
 
 ## 前置知识要求
 
@@ -11,15 +11,14 @@ C/C++ 源文件要经过编译、链接才能成为可执行程序。在工程�
 
 ## 实验约定
 
-准备 GCC、Clang、GNU Binutils（`ar`、`nm`、`objdump`）、GNU Make、CMake 3.28 或更高版本，以及 Ninja。GCC 和 Clang 的环境中还需要可用的 C/C++ 标准库及开发头文件。
+准备 GCC、Clang 和 GNU Binutils（`ar`、`nm`、`objdump`）。GCC 和 Clang 的环境中还需要可用的 C/C++ 标准库及开发头文件。
 
 先确认工具入口：
 
 ```sh
-command -v gcc clang g++ clang++ ar nm objdump make cmake ninja
+command -v gcc clang g++ clang++ ar nm objdump
 gcc --version
 clang --version
-cmake --version
 ```
 
 工具安装与环境配置相关问题请在学习了[软件安装、包管理](../../engineering/shell-basics/package-management.md)后自行解决。

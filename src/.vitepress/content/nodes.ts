@@ -1,18 +1,22 @@
 import embeddedCircuitBasics from "#nodes/embedded/circuit-basics/meta.ts"
 import embeddedMcuStructure from "#nodes/embedded/mcu-structure/meta.ts"
 import cCppEngineeringToolchain from "#nodes/c-cpp-engineering/c-cpp-toolchain/meta.ts"
+import cCppEngineeringBuildSystems from "#nodes/c-cpp-engineering/build-systems/meta.ts"
 import engineeringGitBasics from "#nodes/engineering/git-basics/meta.ts"
 import engineeringGitRemote from "#nodes/engineering/git-remote/meta.ts"
 import engineeringShellBasics from "#nodes/engineering/shell-basics/meta.ts"
+import embeddedStm32Toolchains from "#nodes/embedded/stm32-toolchains/meta.ts"
 
 /** 全部合法节点 ID。 */
 export const nodeIds = [
   "engineering.shell-basics",
   "c-cpp-engineering.c-cpp-toolchain",
+  "c-cpp-engineering.build-systems",
   "engineering.git-basics",
   "engineering.git-remote",
   "embedded.circuit-basics",
-  "embedded.mcu-structure"
+  "embedded.mcu-structure",
+  "embedded.stm32-toolchains"
 ] as const
 
 /** 合法节点 ID。 */
@@ -47,10 +51,12 @@ export type NodeDefinition = {
 export const nodes = {
   [engineeringShellBasics.id]: engineeringShellBasics,
   [cCppEngineeringToolchain.id]: cCppEngineeringToolchain,
+  [cCppEngineeringBuildSystems.id]: cCppEngineeringBuildSystems,
   [engineeringGitBasics.id]: engineeringGitBasics,
   [engineeringGitRemote.id]: engineeringGitRemote,
   [embeddedCircuitBasics.id]: embeddedCircuitBasics,
-  [embeddedMcuStructure.id]: embeddedMcuStructure
+  [embeddedMcuStructure.id]: embeddedMcuStructure,
+  [embeddedStm32Toolchains.id]: embeddedStm32Toolchains
 } satisfies Record<NodeId, NodeDefinition>
 
 /** 前端使用的节点数据。 */
