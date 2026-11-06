@@ -1,6 +1,6 @@
 import embeddedCircuitBasics from "#nodes/embedded/circuit-basics/meta.ts"
 import embeddedMcuStructure from "#nodes/embedded/mcu-structure/meta.ts"
-import engineeringCCppToolchain from "#nodes/engineering/c-cpp-toolchain/meta.ts"
+import cCppEngineeringToolchain from "#nodes/c-cpp-engineering/c-cpp-toolchain/meta.ts"
 import engineeringGitBasics from "#nodes/engineering/git-basics/meta.ts"
 import engineeringGitRemote from "#nodes/engineering/git-remote/meta.ts"
 import engineeringShellBasics from "#nodes/engineering/shell-basics/meta.ts"
@@ -8,7 +8,7 @@ import engineeringShellBasics from "#nodes/engineering/shell-basics/meta.ts"
 /** 全部合法节点 ID。 */
 export const nodeIds = [
   "engineering.shell-basics",
-  "engineering.c-cpp-toolchain",
+  "c-cpp-engineering.c-cpp-toolchain",
   "engineering.git-basics",
   "engineering.git-remote",
   "embedded.circuit-basics",
@@ -46,7 +46,7 @@ export type NodeDefinition = {
 /** 由各节点目录中的元数据组成的中央注册表。 */
 export const nodes = {
   [engineeringShellBasics.id]: engineeringShellBasics,
-  [engineeringCCppToolchain.id]: engineeringCCppToolchain,
+  [cCppEngineeringToolchain.id]: cCppEngineeringToolchain,
   [engineeringGitBasics.id]: engineeringGitBasics,
   [engineeringGitRemote.id]: engineeringGitRemote,
   [embeddedCircuitBasics.id]: embeddedCircuitBasics,

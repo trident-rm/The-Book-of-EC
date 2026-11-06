@@ -1,7 +1,7 @@
 import type { NodeDefinition } from "#content/nodes.ts"
 
 export default {
-  id: "engineering.c-cpp-toolchain",
+  id: "c-cpp-engineering.c-cpp-toolchain",
   title: "C/C++ 工具链与构建流程",
   summary: "标准与实现、编译产物、多文件与静态库，以及 Make、CMake、增量构建和交叉编译。",
   prerequisites: ["engineering.shell-basics"],

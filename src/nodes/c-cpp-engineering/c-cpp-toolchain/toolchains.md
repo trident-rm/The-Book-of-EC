@@ -36,7 +36,7 @@ C 和 C++ 是分别演进的语言，各自有标准。例如 C99、C11、C17、
 
 Visual Studio 是 IDE，MSVC 是其中可以使用的工具体系。编辑器界面相同，也可能配置不同的工具链；应查看实际执行的命令。
 
-MinGW-w64 提供 Windows 相关的头文件、导入库和支持库等，通常与 GCC 或 LLVM 组合。它与编译器处于不同层次。[WinLibs 安装示例](../shell-basics/package-management.md#案例二-winlibs)展示的就是一套打包好的组合。
+MinGW-w64 提供 Windows 相关的头文件、导入库和支持库等，通常与 GCC 或 LLVM 组合。它与编译器处于不同层次。[WinLibs 安装示例](../../engineering/shell-basics/package-management.md#案例二-winlibs)展示的就是一套打包好的组合。
 
 [Clang 工具链文档](https://clang.llvm.org/docs/Toolchain.html)可用于核对其编译器、链接器和库的组合；[MSVC 构建参考](https://learn.microsoft.com/en-us/cpp/build/reference/c-cpp-building-reference)用于查找微软工具及选项；[MinGW-w64 官方介绍](https://www.mingw-w64.org/)说明它提供的支持内容。
 
