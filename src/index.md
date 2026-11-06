@@ -9,6 +9,7 @@ hero:
 ## 按专题浏览
 
 <div class="capability-map">
-  <VPLink href="/map/topics/engineering"><strong>工程与协作</strong><span>命令行、C/C++ 构建、版本管理与远程协作。</span></VPLink>
+  <VPLink href="/map/topics/engineering"><strong>工程与协作</strong><span>命令行、版本管理与远程协作。</span></VPLink>
+  <VPLink href="/map/topics/c-cpp-engineering"><strong>C/C++ 工程</strong><span>C/C++ 工具链、编译链接与构建系统。</span></VPLink>
   <VPLink href="/map/topics/embedded"><strong>电子与嵌入式</strong><span>电路、电平与 MCU 结构。</span></VPLink>
 </div>

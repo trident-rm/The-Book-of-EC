@@ -16,12 +16,11 @@ function defineTopics<const Registry extends Record<string, TopicShape>>(registr
 export const topics = defineTopics({
   engineering: {
     title: "工程与协作",
-    members: [
-      "engineering.shell-basics",
-      "engineering.c-cpp-toolchain",
-      "engineering.git-basics",
-      "engineering.git-remote"
-    ]
+    members: ["engineering.shell-basics", "engineering.git-basics", "engineering.git-remote"]
+  },
+  "c-cpp-engineering": {
+    title: "C/C++ 工程",
+    members: ["engineering.c-cpp-toolchain"]
   },
   embedded: {
     title: "电子与嵌入式",
