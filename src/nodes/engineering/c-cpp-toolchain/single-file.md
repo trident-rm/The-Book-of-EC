@@ -1,4 +1,4 @@
-# 单文件编译与四个阶段
+# 编译指令和构建流程
 
 ## 从一条编译命令开始
 
@@ -6,12 +6,18 @@
 
 <<< ./assets/single-file/main.c{c}
 
-使用 gcc 编译并运行：
+使用 gcc 编译 `main.c`：
 
 ```sh
-mkdir -p build
-gcc -std=c17 -Wall -Wextra -Wpedantic -O0 main.c -o build/calc-demo
-./build/calc-demo
+gcc -std=c17 main.c -o main
+```
+
+`-std=c17` 选择 C17 标准，`-o main` 指定输出文件名为 `main`。编译器会自动选择预处理、编译、汇编和链接四个阶段，生成可执行程序 `main`。
+
+运行 `main`：
+
+```sh
+./main
 ```
 
 预期输出：
@@ -20,24 +26,14 @@ gcc -std=c17 -Wall -Wextra -Wpedantic -O0 main.c -o build/calc-demo
 2 + 3 = 5
 ```
 
-Clang 的对应命令为：
+改用 Clang 的对应命令则为：
 
 ```sh
-clang -std=c17 -Wall -Wextra -Wpedantic -O0 main.c -o build/calc-clang
-./build/calc-clang
+clang -std=c17 main.c -o main
+./main
 ```
 
-它应产生相同的程序输出；生成的机器代码和诊断文本可以不同。
-
-| 参数                             | 本例中的含义                           |
-| -------------------------------- | -------------------------------------- |
-| `main.c`                         | 输入源文件                             |
-| `-o build/calc-demo`             | 指定最终输出文件路径；父目录需要先存在 |
-| `-std=c17`                       | 选择 C17 语言模式                      |
-| `-Wall`, `-Wextra`, `-Wpedantic` | 开启几组有助于发现问题及扩展用法的诊断 |
-| `-O0`                            | 使用便于初步观察代码对应关系的优化等级 |
-
-接下来我们来详细解释。
+它应产生相同的程序输出，但生成的机器代码和诊断文本可能不同。
 
 ## 宏定义、警告与优化
 
@@ -46,8 +42,8 @@ clang -std=c17 -Wall -Wextra -Wpedantic -O0 main.c -o build/calc-clang
 源码用 `#ifndef` 为 `CALC_TRACE` 提供默认值 `0`。命令行定义同名宏后，这个默认定义就会被跳过：
 
 ```sh
-gcc -std=c17 -DCALC_TRACE=1 main.c -o build/calc-trace
-./build/calc-trace
+gcc -std=c17 -DCALC_TRACE=1 main.c -o main
+./main
 ```
 
 预期输出：
@@ -76,13 +72,13 @@ int main(void)
 对同一份源码依次执行三组命令。每次编译后立即用 `echo $?` 查看上一条命令的退出状态：`0` 表示成功，非零表示失败。
 
 ```sh
-gcc -std=c17 unused.c -o build/unused-default
+gcc -std=c17 unused.c          # 注意没有提供 -o 会发生什么？
 echo $?
 
-gcc -std=c17 -Wall unused.c -o build/unused-warning
+gcc -std=c17 -Wall unused.c
 echo $?
 
-gcc -std=c17 -Wall -Werror unused.c -o build/unused-error
+gcc -std=c17 -Wall -Werror unused.c
 echo $?
 ```
 
@@ -109,13 +105,38 @@ error: unused variable 'unused' [-Werror=unused-variable]
 
 优化会改变生成代码、编译耗时和调试时的观察结果。`-O0` 适合先观察源代码与汇编的大致关系；`-O2` 开启更多优化，可能内联函数、折叠常量或消除无用代码。
 
-不过，`-O0` 也包含生成代码所必需的转换，`-O2` 则不保证每个程序都更快或更小。
+将以下代码保存为 `sum.c`：
+
+```c
+#include <stdio.h>
+
+int main(void) {
+    int sum = 0;
+    for (int i = 0; i <= (int)5e8; i++)
+        sum += 2;
+    printf("%d\n", sum);
+    return 0;
+}
+```
+
+用不同的优化等级编译并对比运行速度：
+
+```sh
+gcc -std=c17 -O0 sum.c -o sum-o0
+gcc -std=c17 -O2 sum.c -o sum-o2
+
+# 分别运行，对比差异
+./sum-o0
+./sum-o2
+```
+
+在这个案例的 O2 优化下，gcc 会在编译阶段直接计算出循环的结果，生成的程序不需要执行循环就能输出结果，因此运行速度会快得多。
 
 各等级具体控制什么，可查 [GCC 优化选项](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html)。
 
 ## 四个阶段及产物
 
-本例用下面的模型观察构建：
+C/C++ 的构建通常可以分为四个阶段：预处理、编译、汇编和链接。
 
 ```mermaid
 ---
@@ -130,39 +151,32 @@ flowchart TB
     o -->|链接| app["可执行程序"]
 ```
 
-这里“编译”专指将预处理后的 C 程序转换为汇编文本的阶段；日常口语中的“编译项目”也可能指整段构建过程。
+这里“编译”专指将预处理后的 C 程序转换为汇编文本的阶段；但日常口语中的“编译项目”也常常指整段构建过程。
 
 ### 1. 预处理：得到 `.i`
 
+`-E` 选项让 gcc 停在预处理阶段之后。
+
 ```sh
-gcc -std=c17 -DCALC_TRACE=0 -E main.c -o build/main.i
+gcc -std=c17 -DCALC_TRACE=0 -E main.c -o main.i
 ```
 
-预处理处理 `#include`、宏替换和条件编译等指令。`stdio.h` 的内容会出现在结果中，因此 `.i` 往往比源码长得多。与本例有关的文本节选大致如下：
+预处理处理 `#include`、宏替换和条件编译等指令。`stdio.h` 的内容会出现在结果中，因此 `.i` 往往比源码长得多。
 
-```c
-/* 省略系统头文件展开内容和来源行标记 */
-int calc_add(int a, int b)
-{
-    return a + b;
-}
-
-int main(void)
-{
-    printf("2 + 3 = %d\n", calc_add(2, 3));
-    return 0;
-}
-```
-
-日志语句已被排除。把命令改为 `-DCALC_TRACE=1` 并写入另一个 `.i`，应能在 `calc_add` 中找到日志调用。`#include <stdio.h>` 带入的是声明等头文件内容，`printf` 的库实现由后续链接处理。
+将宏定义改为 `-DCALC_TRACE=1`，生成的 `.i` 文件有什么不同？
 
 ### 2. 编译：得到 `.s`
 
+`-S` 选项让 gcc 停在编译阶段之后，输出汇编（assembly）文本。
+
 ```sh
-gcc -std=c17 -Wall -Wextra -Wpedantic -O0 -S build/main.i -o build/main.s
+gcc -std=c17 -S main.i -o main.s
+
+# 也可以直接从源码编译得到汇编文本：
+gcc -std=c17 -S main.c -o main.s
 ```
 
-编译器进行语法、类型等检查并生成代码。本例的输出是可以阅读的汇编文本；x86-64 Linux 上可能看到类似节选：
+编译器进行语法、类型等检查并生成代码，本例的输出是可以阅读的汇编文本。x86-64 Linux 上可能看到类似节选：
 
 ```asm
     .globl calc_add
@@ -173,55 +187,61 @@ calc_add:
     ret
 ```
 
-此处只需辨认函数标签和机器指令的文本形式。具体寄存器、指令和辅助信息随环境变化。
+这一段是 `calc_add` 函数的汇编实现。
 
-再直接从源码比较两种优化等级：
+我们也可以从生成的汇编代码来对比一下优化的效果：
 
 ```sh
-gcc -std=c17 -O0 -S main.c -o build/main-o0.s
-gcc -std=c17 -O2 -S main.c -o build/main-o2.s
-diff -u build/main-o0.s build/main-o2.s
+gcc -std=c17 -O0 -S main.c -o main-o0.s
+gcc -std=c17 -O2 -S main.c -o main-o2.s
+
+# 用一个文本编辑器打开对比生成的两个汇编文件；或者也可以用 diff 命令：
+diff -u main-o0.s main-o2.s
 ```
 
-重点查看 `main` 中是否仍调用 `calc_add`，以及是否直接使用已计算的常量 `5`。以实际产物为准；`diff` 返回非零在这里通常表示文件存在差异。
+可以发现 O2 优化后的 `main` 函数中不再有对 `calc_add` 的调用了，编译器直接将 `2 + 3` 的结果计算出来了。
+
+此时如果细心观察可能会发现，O2 优化后虽然没有对 `calc_add` 的调用了，但汇编代码里却还保留着它的实现。那么为什么编译器不直接彻底删掉这个函数呢？不要着急。当学完本节剩余的内容后，你就能解答这个问题了。
 
 ### 3. 汇编：得到 `.o`
 
+`-c` 选项让 gcc 停在汇编阶段之后，输出二进制目标文件（object file）。
+
 ```sh
-gcc -c build/main.s -o build/main.o
-file build/main.o
-nm build/main.o
-objdump -dr build/main.o
+gcc -c main.s -o main.o
+
+# 也可以直接从源码编译得到目标文件：
+gcc -std=c17 -c main.c -o main.o
 ```
 
-`.o` 是二进制目标文件，包含机器代码、数据、符号和重定位信息等。它通常还不能直接执行。`file` 的结果应包含 `relocatable`，表示可重定位目标文件。
+`.o` 是二进制目标文件，没法再用普通的文本方式阅读。它包含机器代码、数据、符号和重定位信息等，可以用以下工具查看：
 
-`nm` 列出符号，忽略地址后可找到：
-
-```
-T calc_add
-T main
-U printf
+```sh
+objdump -dr main.o
+nm main.o
 ```
 
-`T` 表示本目标文件的代码区定义了该符号；`U` 表示该符号还需要外部定义。本例已经包含 `printf` 的声明，也能生成调用代码，但尚未完成与库的链接。
+`objdump -dr` 把机器代码反汇编并显示重定位信息。可以看到输出的反汇编结果和之前的 `.s` 文件内容类似。
 
-`objdump -dr` 把机器代码反汇编并显示重定位信息。某条加法指令可能显示为：
+`nm` 列出符号和地址，结果类似于：
 
 ```
-10:  01 d0    add %edx,%eax
+0000000000000000 T calc_add
+0000000000000018 T main
+                 U printf
 ```
 
-地址和字节值仅作示意。这里看到的是工具对二进制文件的解释，`.o` 自身并不是这些文本。[`nm` 文档](https://sourceware.org/binutils/docs/binutils/nm.html)用于查询符号类别，[`objdump` 文档](https://sourceware.org/binutils/docs/binutils/objdump.html)用于查询反汇编和重定位选项。
+`T` 表示本目标文件的代码区定义了该符号，前面的数字则是其地址；`U` 表示该符号还需要外部定义。
+
+`printf` 的实现由 C 标准库提供，而不在 `main.o` 中。要生成可执行程序，还需要链接相应的 C 库以满足这一引用。
 
 ### 4. 链接：得到可执行程序
 
 ```sh
-gcc build/main.o -o build/calc-staged
-file build/calc-staged
-./build/calc-staged
+gcc main.o -o main
+./main
 ```
 
 `gcc` 驱动链接器，将目标文件与所需的启动支持和库组合起来，处理符号引用及地址安排。这里通过默认的 C 库链接满足 `printf` 等引用。
 
-`file` 的结果应包含 `executable`，运行应打印 `2 + 3 = 5`。常见 Linux 环境生成的是动态链接程序；运行时加载器还会参与加载所需共享库。链接完成不表示所有库实现都已复制进可执行文件。
+不过，链接完成并不表示所有库实现都已复制进可执行文件。采用动态链接时，运行时加载器会根据程序记录的依赖，查找并加载所需的共享库，使程序能够使用其中的实现。静态库与共享库的区别将在下一节介绍。

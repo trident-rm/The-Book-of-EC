@@ -8,7 +8,7 @@ export default {
   parts: [
     { title: "学习目标与准备", path: "intro.md" },
     { title: "标准、实现与工具链", path: "toolchains.md" },
-    { title: "单文件编译与四个阶段", path: "single-file.md" },
+    { title: "编译指令和构建流程", path: "single-file.md" },
     { title: "多文件构建", path: "multi-file.md" },
     { title: "构建系统：Makefile、CMake", path: "build-systems.md" }
   ]

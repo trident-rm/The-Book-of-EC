@@ -174,11 +174,11 @@ Makefile 可以用模式规则、自动依赖等机制管理更大的工程，�
 | `project(... LANGUAGES C)`     | 声明工程并启用 C 语言                                                   |
 | `set()`                        | 设置变量；这里用三个 `CMAKE_C_*` 变量为随后创建的目标初始化语言标准要求 |
 | `option()`                     | 定义布尔缓存选项，给出描述与初始默认值                                  |
-| `add_library(calc STATIC ...)` | 用列出的源码创建静态库目标                                              |
-| `add_executable()`             | 用列出的源码创建可执行程序目标                                          |
-| `target_include_directories()` | 为目标声明头文件搜索目录及传播范围                                      |
+| `add_library(calc STATIC ...)` | 创建静态库目标（target）                                                |
+| `add_executable()`             | 创建可执行程序目标（target）                                            |
+| `target_include_directories()` | 为目标声明头文件搜索目录。相当于 `-I`                                   |
 | `target_compile_options()`     | 为目标添加编译选项                                                      |
-| `target_compile_definitions()` | 为目标添加预处理宏定义，参数中省略 `-D`                                 |
+| `target_compile_definitions()` | 为目标添加预处理宏定义。相当于 `-D`                                     |
 | `target_link_libraries()`      | 声明目标的链接依赖，并使用依赖目标提供的使用要求                        |
 
 `CMAKE_C_STANDARD 17`、`CMAKE_C_STANDARD_REQUIRED ON` 和 `CMAKE_C_EXTENSIONS OFF` 共同要求本例使用 C17 模式，并关闭 GNU 扩展模式。
@@ -247,7 +247,7 @@ cmake --build build-cmake --verbose
 
 观察详细构建输出：这次只需重编译 `calc.c`、更新库并重新链接；`main.c` 不受私有日志宏影响。CMake 生成的规则也能处理本例中目标编译参数的变化。
 
-CMake 还会为这些 C 文件安排头文件依赖追踪。可以分别 `touch src/main.c`、`touch src/calc.c` 或 `touch include/calc.h`，每次更新后都执行构建，按[上一节静态库方案的依赖图](./multi-file.md#增量构建)核对哪些目标文件、库和程序需要更新。CMake 使用的构建目录和目标文件名可以不同，依赖关系相同。重新执行构建而输入未变时，应沿用产物。
+CMake 还会为这些 C 文件安排头文件依赖追踪。可以分别 `touch src/main.c`、`touch src/calc.c` 或 `touch include/calc.h`，每次更新后都执行构建，并且只更新受影响的目标。
 
 ## Ninja：另一种构建后端
 
@@ -344,8 +344,6 @@ make clean
 
 优化可能使代码重排、内联，导致单步顺序或变量显示与源码不完全对应。具体选项可以被工具链、环境和工程设置改变，应查看实际命令；Release 也可以另行启用调试信息。上述默认值可在 [CMake 的 GNU 编译器模块](https://github.com/Kitware/CMake/blob/v3.28.6/Modules/Compiler/GNU.cmake)中核对。
 
-本实验继续使用 `Unix Makefiles` 这一单配置生成器，在配置时通过 `CMAKE_BUILD_TYPE` 选择 `Debug` 或 `Release`；未设置时不能假定它就是 Debug。[CMake 构建配置文档](https://cmake.org/cmake/help/v3.28/manual/cmake-buildsystem.7.html#build-configurations)解释了配置的选择方式。
-
 完成以下修改：
 
 1. 修改 `CMakeLists.txt` 中添加日志宏的条件：Debug 下尊重 `CALC_TRACE` 开关，Release 下始终不启用日志，即使调用者指定了 `CALC_TRACE=ON`。可结合 `CMAKE_BUILD_TYPE`、`CALC_TRACE` 和 `if()` 判断；本实验统一使用表中的配置名拼写。
@@ -362,7 +360,7 @@ make run
 make run-release
 ```
 
-两者都应打印加法和减法结果，只有 Debug 输出加法日志。查看首次构建的详细命令：Debug 应带调试信息选项，Release 应带优化选项和 `NDEBUG` 宏。这个规模的示例不适合用单次运行耗时比较性能。
+两者都应打印加法和减法结果，只有 Debug 输出加法日志。查看首次构建的详细命令：Debug 应带调试信息选项，Release 应带优化选项和 `NDEBUG` 宏。
 
 再绕过命令入口，直接检验 CMakeLists.txt 中的日志规则：
 

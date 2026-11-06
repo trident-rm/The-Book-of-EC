@@ -1,6 +1,6 @@
 # 标准、实现与工具链
 
-语言**标准**规定程序的含义和**实现**必须满足的要求；**工具链**把这些规则落实为具体工具和库。选择了同一语言标准，也仍需核对工具版本、扩展、选项和二进制兼容性。
+语言**标准**规定程序的含义和**实现**必须满足的要求；**工具链**把这些规则落实为具体工具和库。
 
 ## 标准规定什么
 
@@ -108,7 +108,7 @@ error: '__builtin_dump_struct' was not declared in this scope
 
 两条命令选择了同一语言标准，结果仍不同。因为 `__builtin_dump_struct` 不属于标准 C++17，而是 Clang 提供的内建扩展，本例实测的 GCC 版本并不支持它。
 
-[Clang](https://clang.llvm.org/docs/LanguageExtensions.html) 和 [GCC](https://gcc.gnu.org/onlinedocs/gcc/C-Extensions.html) 都各自提供了很多标准之外的扩展，以增强 C/C++ 的能力。但是这也带来了另一个问题：同一份代码在不同实现上可能有不同的行为，甚至无法编译。
+[Clang](https://clang.llvm.org/docs/LanguageExtensions.html) 和 [GCC](https://gcc.gnu.org/onlinedocs/gcc/C-Extensions.html) 都各自提供了很多标准之外的扩展，以增强 C/C++ 的能力。但是这也带来了另一个问题：同一份代码在不同实现上可能有不同的行为，甚至无法编译也就是降低了**可移植性**。
 
 ### 用条件编译提供备用实现
 
@@ -164,10 +164,10 @@ Point { x = 2, y = 3 }
 
 两种实现都输出了相同的字段值，排版不同。以后某个实现增加了该扩展，能力探测也能自动选中扩展分支。
 
-这里优先检测能力，而不是猜测编译器品牌：Clang 也定义了 GNU 兼容宏 `__GNUC__`，单独检查它不能区分 GCC 与 Clang。[Clang 的能力探测说明](https://clang.llvm.org/docs/LanguageExtensions.html#has-builtin)给出备用宏的写法，[GCC 的 `__has_builtin` 文档](https://gcc.gnu.org/onlinedocs/cpp/_005f_005fhas_005fbuiltin.html)说明其在当前语言及模式下的判断规则。
+关于 `__has_builtin` 宏的详细说明可见：[Clang 的能力探测说明](https://clang.llvm.org/docs/LanguageExtensions.html#has-builtin)；[GCC 的 `__has_builtin` 文档](https://gcc.gnu.org/onlinedocs/cpp/_005f_005fhas_005fbuiltin.html)。
 
 ## C++ 的构建入口与库
 
-C++ 源码通常使用 `g++`、`clang++` 构建，并通过 `-std=c++17` 等选项选择语言模式。`gcc` 能根据 `.cpp` 后缀识别 C++，但不会自动加入 C++ 标准库链接；`g++` 会加入。因此直接替换驱动程序，可能在链接阶段失败。[GCC 的 C++ 编译说明](https://gcc.gnu.org/onlinedocs/gcc/Invoking-G_002b_002b.html)解释了这一差异。
+C++ 源码通常使用 `g++`、`clang++` 构建，并通过 `-std=c++17` 等选项选择语言模式。`gcc` 能根据 `.cpp` 后缀识别 C++，但不会自动加入 C++ 标准库链接；`g++` 会加入。因此直接把命令中的 `g++` 替换为 `gcc` 可能在链接阶段失败。[GCC 的 C++ 编译说明](https://gcc.gnu.org/onlinedocs/gcc/Invoking-G_002b_002b.html)解释了这一差异。
 
-C++ 标准库也有不同实现，例如 libstdc++ 和 libc++。选择编译器时，还要核对实际使用的标准库及 ABI 要求；本例的源码兼容处理不能保证任意已编译库之间的二进制兼容。后续示例恢复使用 C。
+C++ 标准库也有不同实现，例如 libstdc++ 和 libc++。选择编译器时，还要核对实际使用的标准库及 ABI 要求。
