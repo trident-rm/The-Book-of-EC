@@ -16,7 +16,12 @@ export const cmakeFiles = [
   { path: "CMakeLists.txt", slot: "cmake" }
 ] satisfies readonly CodeTreeFile[]
 
-export const commandRunnerFiles = [
+export const presetFiles = [
   ...cmakeFiles,
+  { path: "CMakePresets.json", slot: "presets" }
+] satisfies readonly CodeTreeFile[]
+
+export const commandRunnerFiles = [
+  ...presetFiles,
   { path: "Makefile", slot: "makefile" }
 ] satisfies readonly CodeTreeFile[]

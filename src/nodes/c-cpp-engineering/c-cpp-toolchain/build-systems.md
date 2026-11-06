@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { makeFiles, cmakeFiles, commandRunnerFiles } from "./example-files.ts"
+import { makeFiles, cmakeFiles, presetFiles, commandRunnerFiles } from "./example-files.ts"
 </script>
 
 # 构建系统：Makefile、CMake
@@ -249,9 +249,71 @@ cmake --build build-cmake --verbose
 
 CMake 还会为这些 C 文件安排头文件依赖追踪。可以分别 `touch src/main.c`、`touch src/calc.c` 或 `touch include/calc.h`，每次更新后都执行构建，并且只更新受影响的目标。
 
+### CMake Preset
+
+**Preset（预设）**将一组 CMake 配置或构建选项保存到文件中，供命令按名称使用。`CMakeLists.txt` 描述工程中的目标与要求；预设记录所选的生成器、构建目录、缓存变量等，免去重复输入长命令。
+
+沿用前面的四个文件，在工程根目录新建 `CMakePresets.json`，注意文件名的大小写：
+
+<CodeTree title="calc-demo · CMake Preset" :files="presetFiles" initial-file="CMakePresets.json" :initialSidebarExpanded="false">
+<template #header>
+
+<<< ./assets/calc-demo/include/calc.h{c}
+
+</template>
+<template #calc>
+
+<<< ./assets/calc-demo/src/calc.c{c}
+
+</template>
+<template #main>
+
+<<< ./assets/calc-demo/src/main.c{c}
+
+</template>
+<template #cmake>
+
+<<< ./assets/calc-demo/cmake-lists.txt{cmake}
+
+</template>
+<template #presets>
+
+<<< ./assets/calc-demo/cmake-presets.json{json}
+
+</template>
+</CodeTree>
+
+`version` 是预设文件的格式版本，`8` 要求 CMake 3.28 或更高版本，与本章的环境约定一致。
+
+| 字段               | 作用                                                            |
+| ------------------ | --------------------------------------------------------------- |
+| `configurePresets` | 定义配置预设；本例中有一个名为 `debug` 的预设                   |
+| `generator`        | 对应配置命令的 `-G`，本例使用 `Unix Makefiles`                  |
+| `binaryDir`        | 对应 `-B`，本例展开为源码目录下的 `build-debug/`                |
+| `cacheVariables`   | 对应配置命令的 `-D`，设置编译器、构建配置和日志选项             |
+| `buildPresets`     | 定义构建预设；通过 `configurePreset` 关联配置预设，确定构建目录 |
+| `verbose`          | 设为 `true`，相当于构建命令的 `--verbose`                       |
+
+`${sourceDir}` 和 `${presetName}` 是预设文件的宏，分别展开为源码目录和当前预设名。这里用它们为不同配置安排独立目录，分别保存缓存和产物。预设名 `debug` 可以自定；实际选择 Debug 配置的是 `CMAKE_BUILD_TYPE` 的值。
+
+在工程根目录列出配置预设，再配置、构建和运行：
+
+```sh
+cmake --list-presets
+cmake --preset debug
+cmake --build --preset debug
+./build-debug/calc-demo
+```
+
+第一条命令应列出 `debug`。配置和构建预设可以同名，由命令区分；运行程序应先输出加法日志，再打印 `2 + 3 = 5`。
+
+构建预设通过关联的配置预设找到构建目录，但不会先按它执行配置。首次使用或修改配置预设后，应先运行 `cmake --preset debug`，再构建。
+
+团队共用的配置放在 `CMakePresets.json` 中，随源码提交；机器路径等个人配置可放在 `CMakeUserPresets.json` 中，并将后者加入 `.gitignore`。预设记录配置选择，本例仍要求 Linux、GCC 和 GNU Make 环境已准备好。[CMake Preset 手册](https://cmake.org/cmake/help/v3.28/manual/cmake-presets.7.html)用于查询完整字段，以及继承、条件和工作流等扩展用法。
+
 ## Ninja：另一种构建后端
 
-Ninja 也根据依赖执行构建命令，它可以代替 GNU Make，被 CMake 等工具使用。沿用同一份源码和 `CMakeLists.txt`，换一个构建目录及生成器即可体验：
+Ninja 也根据依赖执行构建命令，它可以代替 GNU Make，被 CMake 等工具使用。沿用同一份源码和 `CMakeLists.txt`，这里显式指定生成器和构建目录，便于观察后端切换：
 
 ```sh
 cmake -S . -B build-ninja -G Ninja \
@@ -264,9 +326,9 @@ CMake 这次生成 `build.ninja`，由 Ninja 执行。Ninja 还把命令变化�
 
 ## 命令运行器
 
-CMake 的配置命令包含生成器、构建目录和选项，重复输入比较繁琐。有没有办法可以简化呢？
+Preset 保存了 CMake 选项，配置、构建、运行仍需要多条命令。命令运行器可以把这些操作编排成固定任务，并提供清理入口。
 
-沿用 [CMakeLists.txt](#cmakelists-txt) 一节中的四个文件，在工程根目录加入下面的新 `Makefile`：
+沿用 [CMake Preset](#cmake-preset) 一节中的五个文件，在工程根目录加入下面的新 `Makefile`：
 
 <CodeTree title="calc-demo · 命令运行器" :files="commandRunnerFiles" initial-file="Makefile" :initialSidebarExpanded="false">
 <template #header>
@@ -289,6 +351,11 @@ CMake 的配置命令包含生成器、构建目录和选项，重复输入比�
 <<< ./assets/calc-demo/cmake-lists.txt{cmake}
 
 </template>
+<template #presets>
+
+<<< ./assets/calc-demo/cmake-presets.json{json}
+
+</template>
 <template #makefile>
 
 <<< ./assets/calc-demo/command-runner-makefile{makefile}
@@ -296,13 +363,13 @@ CMake 的配置命令包含生成器、构建目录和选项，重复输入比�
 </template>
 </CodeTree>
 
-| 命令                  | 作用                                                                                 |
-| --------------------- | ------------------------------------------------------------------------------------ |
-| `make build` / `make` | 配置并构建 Debug；使用 GCC、`Unix Makefiles`、`build-debug/`，并设置 `CALC_TRACE=ON` |
-| `make run`            | 先完成上述构建，再运行 `build-debug/calc-demo`                                       |
-| `make clean`          | 删除 `build-debug/`，包括其中的缓存、生成规则和编译产物；目录不存在时也能成功        |
+| 命令                  | 作用                                                                          |
+| --------------------- | ----------------------------------------------------------------------------- |
+| `make build` / `make` | 依次使用 `debug` 配置预设和构建预设；产物放在 `build-debug/`，默认开启日志    |
+| `make run`            | 先完成上述构建，再运行 `build-debug/calc-demo`                                |
+| `make clean`          | 删除 `build-debug/`，包括其中的缓存、生成规则和编译产物；目录不存在时也能成功 |
 
-本页开头的手写 Makefile 直接记录 `.c`、`.o`、静态库和程序的依赖；这里的根目录 Makefile 只编排任务。外层 Make 执行任务命令，CMake 读取 `CMakeLists.txt` 并生成构建规则，`cmake --build` 再在构建目录中调用 Make。源码依赖交给 CMake 及其生成的规则管理。
+本页开头的手写 Makefile 直接记录 `.c`、`.o`、静态库和程序的依赖；这里的根目录 Makefile 只编排任务。外层 Make 执行任务命令，CMake 按预设选择配置，读取 `CMakeLists.txt` 并生成构建规则，`cmake --build` 再在构建目录中调用 Make。源码依赖交给 CMake 及其生成的规则管理。
 
 依次体验这些入口：
 
@@ -318,7 +385,7 @@ make clean
 
 ## 自主实验
 
-沿用[命令运行器示例](#命令运行器)中的五文件项目，在 `calc-demo/` 根目录继续修改，依次完成以下两个任务。
+沿用[命令运行器示例](#命令运行器)中的六文件项目，在 `calc-demo/` 根目录继续修改，依次完成以下两个任务。
 
 ### 任务一：为静态库增加功能
 
@@ -333,7 +400,7 @@ make clean
 
 ### 任务二：区分 Debug 与 Release 构建
 
-实际工程通常为同一份源码保留不同的构建配置：Debug 方便定位问题，Release 侧重优化后的运行表现。它们已经是 CMake 的标准配置；本任务要完善的是本工程的日志策略和命令入口。
+实际工程通常为同一份源码保留不同的构建配置：Debug 方便定位问题，Release 侧重优化后的运行表现。它们已经是 CMake 的标准配置；本任务要完善的是本工程的日志策略、Release 预设和命令入口。
 
 在本章使用的 Linux、GCC 环境中，未额外改动编译选项时，CMake 通常采用以下默认值：
 
@@ -347,8 +414,9 @@ make clean
 完成以下修改：
 
 1. 修改 `CMakeLists.txt` 中添加日志宏的条件：Debug 下尊重 `CALC_TRACE` 开关，Release 下始终不启用日志，即使调用者指定了 `CALC_TRACE=ON`。可结合 `CMAKE_BUILD_TYPE`、`CALC_TRACE` 和 `if()` 判断；本实验统一使用表中的配置名拼写。
-2. 为根目录 Makefile 增加 `make release` 和 `make run-release`：前者配置并构建 Release，使用独立的 `build-release/`，设置 `CALC_TRACE=OFF`；后者先构建再运行 Release 程序。原有 Debug 入口仍默认开启日志。
-3. 让 `make clean` 同时删除 `build-debug/`、`build-release/`。保持两套目录独立，便于对照缓存、命令和产物。
+2. 在 `CMakePresets.json` 中增加名为 `release` 的配置预设：沿用 GCC 和 `Unix Makefiles`，将 `CMAKE_BUILD_TYPE` 设为 `Release`、`CALC_TRACE` 设为 `OFF`，使用独立的 `build-release/`。再增加同名构建预设，通过 `configurePreset` 关联它，并保留详细输出。原有 `debug` 预设仍默认开启日志。
+3. 为根目录 Makefile 增加 `make release` 和 `make run-release`：前者依次执行 `release` 配置预设和构建预设，后者先构建再运行 `build-release/calc-demo`。
+4. 让 `make clean` 同时删除 `build-debug/`、`build-release/`。保持两套目录独立，便于对照缓存、命令和产物。
 
 **提示：**日志开关是本工程的策略，CMake 不会因为选择 Release 自动关闭自定义的 trace。保留现有警告选项，让构建配置提供调试、优化选项；若在 `target_compile_options()` 中对所有配置追加 `-O0`，会覆盖 Release 的优化设置。
 
@@ -362,16 +430,18 @@ make run-release
 
 两者都应打印加法和减法结果，只有 Debug 输出加法日志。查看首次构建的详细命令：Debug 应带调试信息选项，Release 应带优化选项和 `NDEBUG` 宏。
 
-再绕过命令入口，直接检验 CMakeLists.txt 中的日志规则：
+再直接使用预设，并用命令行 `-D` 覆盖其中的日志选项，检验 `CMakeLists.txt` 中的日志规则：
 
 ```sh
-cmake -S . -B build-debug -DCMAKE_BUILD_TYPE=Debug -DCALC_TRACE=OFF
-cmake --build build-debug
+cmake --preset debug -DCALC_TRACE=OFF
+cmake --build --preset debug
 ./build-debug/calc-demo
 
-cmake -S . -B build-release -DCMAKE_BUILD_TYPE=Release -DCALC_TRACE=ON
-cmake --build build-release
+cmake --preset release -DCALC_TRACE=ON
+cmake --build --preset release
 ./build-release/calc-demo
 ```
 
-这两次运行都应只打印计算结果，没有 trace。前者验证 Debug 可以关闭日志；后者验证 Release 的限制由 CMakeLists.txt 保证，而不只依赖根目录 Makefile 传入的选项。
+这两次运行都应只打印计算结果，没有 trace。前者验证 Debug 可以关闭日志；后者验证 Release 的限制由 `CMakeLists.txt` 保证，而不只依赖预设传入的选项。
+
+命令行的 `-D` 覆盖本次配置时预设提供的值，并写入对应构建目录的缓存。下次不带覆盖参数使用该配置预设时，会重新应用预设中明确声明的缓存值。
