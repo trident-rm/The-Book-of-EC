@@ -4,6 +4,8 @@ import GitDiagram from "#nodes/engineering/_shared/components/GitDiagram.vue"
 
 # Git 基础
 
+先修：[命令行基础](../shell-basics/intro)。本节点使用终端运行 Git 命令，并用 `mkdir`、`cd` 等命令操作工作目录。
+
 Git 是版本管理工具。它把项目的不同状态组织成可以查看、切换和并行发展的版本历史。
 
 <GitDiagram kind="uses" />

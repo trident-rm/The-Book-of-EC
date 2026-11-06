@@ -46,9 +46,7 @@ const contextIds = computed(() => {
   const members = new Set(topic.value.members)
   // 专题图保留可见成员的外部先修节点，避免割裂依赖上下文。
   return new Set(
-    visibleMembers.value.flatMap((node) =>
-      node.relations.map((relation) => relation.target).filter((target) => !members.has(target))
-    )
+    visibleMembers.value.flatMap((node) => node.prerequisites.filter((id) => !members.has(id)))
   )
 })
 
@@ -61,16 +59,11 @@ const visibleIds = computed(() => new Set(visibleNodes.value.map((node) => node.
 const selected = computed(() => (selectedId.value ? byId.get(selectedId.value) : undefined))
 const selectedPrerequisites = computed(
   () =>
-    selected.value?.relations
-      .map((relation) => ({ ...relation, node: byId.get(relation.target)! }))
-      .filter((relation) => relation.node) ?? []
+    selected.value?.prerequisites.map((id) => byId.get(id)).filter((node) => node !== undefined) ??
+    []
 )
 const selectedFollowers = computed(() =>
-  selected.value
-    ? allNodes.filter((node) =>
-        node.relations.some((relation) => relation.target === selected.value!.id)
-      )
-    : []
+  selected.value ? allNodes.filter((node) => node.prerequisites.includes(selected.value!.id)) : []
 )
 
 function clearSearch() {
@@ -166,15 +159,14 @@ function graphElements(): ElementDefinition[] {
     }
   }))
   const edges = visibleNodes.value.flatMap((node) =>
-    node.relations
-      .filter((relation) => visibleIds.value.has(relation.target))
-      .map((relation) => ({
+    node.prerequisites
+      .filter((id) => visibleIds.value.has(id))
+      .map((id) => ({
         group: "edges" as const,
         data: {
-          id: `${relation.target}->${node.id}:${relation.type}`,
-          source: relation.target,
-          target: node.id,
-          relation: relation.type
+          id: `${id}->${node.id}`,
+          source: id,
+          target: node.id
         }
       }))
   )
@@ -201,8 +193,6 @@ function renderGraph() {
   if (selectedId.value && !visibleIds.value.has(selectedId.value)) selectedId.value = null
   cy.elements().remove()
   cy.add(graphElements())
-  // 推荐关系不约束层级，避免弱关系改变必需依赖的主布局。
-  const layoutElements = cy.nodes().union(cy.edges('[relation = "required"]'))
   const layoutOptions = {
     name: "dagre",
     rankDir: "LR",
@@ -214,7 +204,7 @@ function renderGraph() {
     nodeDimensionsIncludeLabels: true,
     sort: (a, b) => a.id().localeCompare(b.id())
   } satisfies DagreLayoutOptions
-  layoutElements.layout(layoutOptions).run()
+  cy.elements().layout(layoutOptions).run()
   fitGraph()
   applyHighlight()
 }
@@ -279,10 +269,6 @@ onMounted(async () => {
           "target-arrow-color": "#77aa9f",
           "target-arrow-shape": "triangle"
         }
-      },
-      {
-        selector: 'edge[relation = "recommended"]',
-        style: { "line-color": "#9aa4b2", "target-arrow-color": "#9aa4b2", "line-style": "dashed" }
       },
       { selector: ".muted", style: { opacity: 0.17 } },
       { selector: "node.related", style: { "border-width": 2, "border-color": "#63a696" } },
@@ -375,11 +361,8 @@ onBeforeUnmount(() => {
           <section v-if="selectedPrerequisites.length">
             <h3>直接先修</h3>
             <ul>
-              <li v-for="relation in selectedPrerequisites" :key="relation.target">
-                <button type="button" @click="focusNode(relation.target)">
-                  {{ relation.node.title }}
-                </button>
-                <small>{{ relation.type === "required" ? "必需" : "建议" }}</small>
+              <li v-for="node in selectedPrerequisites" :key="node.id">
+                <button type="button" @click="focusNode(node.id)">{{ node.title }}</button>
               </li>
             </ul>
           </section>

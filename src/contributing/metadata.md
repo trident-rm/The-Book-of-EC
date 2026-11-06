@@ -10,13 +10,13 @@ next: false
 
 ## 节点 ID
 
-全部固定 ID 在 `nodes.ts` 的 `nodeIds` 中统一声明，例如 `embedded.mcu-structure`，`NodeId` 从该数组推导。每个 `meta.ts` 必须声明自己的 `id`；关系目标和专题成员只能使用已有 `NodeId`。
+全部固定 ID 在 `nodes.ts` 的 `nodeIds` 中统一声明，例如 `embedded.mcu-structure`，`NodeId` 从该数组推导。每个 `meta.ts` 必须声明自己的 `id`；先修节点和专题成员只能使用已有 `NodeId`。
 
 ## 节点字段
 
 - `title`、`summary`：图中展示的名称和摘要。
 - `id`：与所在节点目录对应的固定 ID。
-- `relations`：指向必需或建议先修节点。
+- `prerequisites`：直接先修节点的 ID 列表，类型为 `readonly NodeId[]`；没有先修时填写 `[]`。
 - `parts`：节点全部页面的标题、Markdown 文件路径与线性顺序；首项为入口页，路径包含 `.md` 扩展名。
 
 ## 专题成员
@@ -25,4 +25,4 @@ next: false
 
 ## 构建验证
 
-中央注册表静态导入全部 `meta.ts`，因此不需要额外的元数据生成命令。TypeScript 负责检查 ID、字段取值和 Markdown 路径扩展名；构建阶段继续检查 `NodeId` 与元数据目录是否一致、已登记页面是否存在、重复页面、重复专题成员和必需依赖环。
+中央注册表静态导入全部 `meta.ts`，因此不需要额外的元数据生成命令。TypeScript 负责检查 ID、字段取值和 Markdown 路径扩展名；构建阶段继续检查 `NodeId` 与元数据目录是否一致、已登记页面是否存在、重复页面、重复专题成员和先修依赖环。

@@ -4,7 +4,7 @@ export default {
   id: "engineering.shell-basics",
   title: "命令行基础",
   summary: "命令结构、文件导航、工具解析、运行环境、软件安装与包管理。",
-  relations: [],
+  prerequisites: [],
   parts: [
     { title: "Introduction", path: "intro.md" },
     { title: "目录、路径与文件操作", path: "filesystem.md" },

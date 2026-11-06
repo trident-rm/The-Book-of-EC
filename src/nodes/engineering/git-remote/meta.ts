@@ -4,7 +4,7 @@ export default {
   id: "engineering.git-remote",
   title: "Git 远程仓库与 GitHub 协作",
   summary: "连接远程仓库、同步分支，并通过 Fork 和 Pull Request 协作。",
-  relations: [{ target: "engineering.git-basics", type: "required" }],
+  prerequisites: ["engineering.git-basics"],
   parts: [
     { title: "Introduction", path: "intro.md" },
     { title: "连接远程仓库", path: "remotes.md" },

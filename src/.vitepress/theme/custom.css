@@ -357,9 +357,6 @@
   text-align: left;
   cursor: pointer;
 }
-.node-drawer small {
-  color: var(--vp-c-text-2);
-}
 .node-entry,
 .VPContent .node-entry {
   align-self: center;

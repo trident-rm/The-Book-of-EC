@@ -24,7 +24,7 @@ function metadataNodeIds(source: string) {
     )
 }
 
-/** 校验节点元数据、页面、必需依赖和专题成员。 */
+/** 校验节点元数据、页面、先修依赖和专题成员。 */
 export function validateContent(source: string) {
   const declaredIds = new Set<string>(nodeIds)
   for (const id of metadataNodeIds(source)) {
@@ -52,12 +52,10 @@ export function validateContent(source: string) {
   const visited = new Set<NodeId>()
   // visiting 表示当前递归路径；再次进入其中的节点即形成环。
   const visit = (id: NodeId) => {
-    if (visiting.has(id)) throw new Error(`必需依赖存在环：${[...visiting, id].join(" → ")}`)
+    if (visiting.has(id)) throw new Error(`先修依赖存在环：${[...visiting, id].join(" → ")}`)
     if (visited.has(id)) return
     visiting.add(id)
-    for (const relation of nodes[id].relations) {
-      if (relation.type === "required") visit(relation.target)
-    }
+    for (const prerequisite of nodes[id].prerequisites) visit(prerequisite)
     visiting.delete(id)
     visited.add(id)
   }

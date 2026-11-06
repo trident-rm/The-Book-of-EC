@@ -8,13 +8,8 @@ declare module "virtual:learning-graph" {
       title: string
       /** 节点学习目标的简述。 */
       summary: string
-      /** 指向直接先修节点的关系。 */
-      relations: Array<{
-        /** 先修节点 ID。 */
-        target: string
-        /** 关系的强制程度。 */
-        type: "required" | "recommended"
-      }>
+      /** 学习当前节点前应先掌握的直接先修节点 ID。 */
+      prerequisites: string[]
       /** 全部页面；首项为节点入口。 */
       parts: Array<{
         /** 页面在侧边栏中的标题。 */

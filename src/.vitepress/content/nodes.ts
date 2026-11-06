@@ -18,9 +18,6 @@ export const nodeIds = [
 /** 合法节点 ID。 */
 export type NodeId = (typeof nodeIds)[number]
 
-/** 先修关系的强制程度。 */
-export type RelationType = "required" | "recommended"
-
 /** 节点 Markdown 文件的相对路径。 */
 export type MarkdownPath = `${string}.md`
 
@@ -40,13 +37,8 @@ export type NodeDefinition = {
   title: string
   /** 节点学习目标的简述。 */
   summary: string
-  /** 指向直接先修节点的关系。 */
-  relations: readonly {
-    /** 先修节点 ID。 */
-    target: NodeId
-    /** 关系的强制程度。 */
-    type: RelationType
-  }[]
+  /** 学习当前节点前应先掌握的直接先修节点 ID。 */
+  prerequisites: readonly NodeId[]
   /** 全部页面；首项为节点入口。 */
   parts: readonly [NodePart, ...NodePart[]]
 }
