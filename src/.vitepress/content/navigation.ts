@@ -23,8 +23,12 @@ export function createSidebar(): DefaultTheme.Sidebar {
         text: "参考资料",
         items: [
           { text: "概览", link: "/reference/" },
-          { text: "如何读技术资料", link: "/reference/reading-docs" },
-          { text: "术语与检索词", link: "/reference/glossary" }
+          { text: "语言与工程", link: "/reference/language-and-engineering" },
+          { text: "芯片与内核", link: "/reference/mcu-and-core" },
+          { text: "RTOS", link: "/reference/rtos" },
+          { text: "通信协议", link: "/reference/protocols" },
+          { text: "开发调试工具", link: "/reference/tools" },
+          { text: "RoboMaster 硬件", link: "/reference/robomaster" }
         ]
       }
     ],
