@@ -50,7 +50,7 @@ vp run dev
 src/
 ├── nodes/                 学习节点正文及其私有、共享资源
 ├── map/                   总学习图和专题入口
-├── reference/             阅读方法、术语和检索词
+├── reference/             常用文档、工具和手册链接
 ├── contributing/          内容模型与维护说明
 └── .vitepress/
     ├── content/           节点、专题、导航和构建验证
