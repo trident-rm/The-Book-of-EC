@@ -4,6 +4,7 @@ export default {
   id: "embedded.stm32-toolchains",
   title: "STM32 工具链",
   summary: "准备 STM32 编译工具链与 CubeMX，理解烧录和调试分工，并用 OpenOCD 识别目标芯片。",
+  hidden: true,
   prerequisites: ["c-cpp-engineering.build-systems"],
   parts: [
     { title: "工具总览与学习目标", path: "intro.md" },
