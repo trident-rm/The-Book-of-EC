@@ -41,6 +41,8 @@ export type NodeDefinition = {
   title: string
   /** 节点学习目标的简述。 */
   summary: string
+  /** 是否从学习图中隐藏节点及其关联边；默认显示。 */
+  hidden?: boolean
   /** 学习当前节点前应先掌握的直接先修节点 ID。 */
   prerequisites: readonly NodeId[]
   /** 全部页面；首项为节点入口。 */
@@ -77,9 +79,10 @@ export function nodePartRoute(id: NodeId, path: MarkdownPath) {
   return `${nodeRoute(id)}${routePath}`
 }
 
-/** 生成按中文标题排序的前端节点列表。 */
+/** 生成按中文标题排序的可见前端节点列表。 */
 export function graphNodes(): GraphNode[] {
   return nodeIds
-    .map((id) => ({ ...nodes[id], route: nodePartRoute(id, nodes[id].parts[0].path) }))
+    .map((id): GraphNode => ({ ...nodes[id], route: nodePartRoute(id, nodes[id].parts[0].path) }))
+    .filter((node) => node.hidden !== true)
     .sort((a, b) => a.title.localeCompare(b.title, "zh-CN"))
 }
