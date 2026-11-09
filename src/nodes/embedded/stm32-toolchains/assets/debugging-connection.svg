@@ -1,13 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="840" height="252" viewBox="0 0 840 252" role="img" aria-labelledby="debugging-title debugging-desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="894" height="252" viewBox="0 0 894 252" role="img" aria-labelledby="debugging-title debugging-desc">
   <title id="debugging-title">在线调试的连接结构</title>
-  <desc id="debugging-desc">Host 电脑内的调试客户端，例如 GDB，通过本机 TCP 连接，使用 GDB 远程协议与 OpenOCD 或 J-Link GDB Server 等调试服务器通信。服务器通过 USB 连接调试探针，使用 CMSIS-DAP 或其他协议。探针例如 ST-LINK、J-Link 或运行 DAPLink 固件的硬件，通过 SWD 或 JTAG 连接 STM32。所有连线均可双向通信。</desc>
+  <desc id="debugging-desc">Host 电脑内的调试客户端，例如 GDB，通过本机 TCP 连接，使用 GDB 远程协议与 ST-LINK GDB Server、J-Link GDB Server 或 OpenOCD 等调试服务器通信。服务器通过 USB 连接调试探针，使用 CMSIS-DAP 或其他协议。探针例如 ST-LINK、J-Link 或运行 DAPLink 固件的硬件，通过 SWD 或 JTAG 连接 STM32。所有连线均可双向通信。</desc>
   <defs>
     <marker id="debugging-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 Z" fill="var(--vp-c-text-2, #525b6b)" />
     </marker>
   </defs>
   <g font-family="system-ui, -apple-system, 'Segoe UI', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif" fill="var(--vp-c-text-1, #242b38)">
-    <rect x="12" y="12" width="374" height="228" rx="14" fill="var(--vp-c-bg-soft, #f6f7f9)" stroke="var(--vp-c-divider, #c8cdd5)" stroke-width="1.5" stroke-dasharray="6 4" />
+    <rect x="12" y="12" width="428" height="228" rx="14" fill="var(--vp-c-bg-soft, #f6f7f9)" stroke="var(--vp-c-divider, #c8cdd5)" stroke-width="1.5" stroke-dasharray="6 4" />
     <text x="28" y="47" font-size="21" font-weight="600">Host（电脑）</text>
 
     <rect x="28" y="88" width="110" height="144" rx="10" fill="var(--vp-c-indigo-soft, #eaf1ff)" stroke="var(--vp-c-indigo-2, #6787c8)" stroke-width="1.5" />
@@ -18,24 +18,25 @@
       </g>
     </g>
 
-    <rect x="224" y="88" width="146" height="144" rx="10" fill="var(--vp-c-indigo-soft, #eaf1ff)" stroke="var(--vp-c-indigo-2, #6787c8)" stroke-width="1.5" />
+    <rect x="240" y="88" width="170" height="144" rx="10" fill="var(--vp-c-indigo-soft, #eaf1ff)" stroke="var(--vp-c-indigo-2, #6787c8)" stroke-width="1.5" />
     <g text-anchor="middle">
-      <text x="297" y="117" font-size="18" font-weight="600">调试服务器</text>
-      <g transform="translate(297)" text-anchor="start" font-size="14">
+      <text x="324" y="117" font-size="18" font-weight="600">调试服务器</text>
+      <g transform="translate(324)" text-anchor="start" font-size="14">
         <g class="tool-example-block" style="transform-box: fill-box; transform: translateX(-50%);">
           <text x="0" y="143" fill="var(--vp-c-text-2, #525b6b)">示例：</text>
           <g role="list" aria-label="调试服务器示例">
-            <text x="0" y="174" role="listitem">• OpenOCD</text>
-            <text x="0" y="205" role="listitem">• J-Link GDB Server</text>
+            <text x="0" y="165" role="listitem">• ST-LINK GDB Server</text>
+            <text x="0" y="188" role="listitem">• J-Link GDB Server</text>
+            <text x="0" y="212" role="listitem">• OpenOCD</text>
           </g>
         </g>
       </g>
     </g>
 
-    <rect x="478" y="88" width="174" height="144" rx="10" fill="var(--vp-c-green-soft, #e7f5ef)" stroke="var(--vp-c-green-2, #58a58d)" stroke-width="1.5" />
+    <rect x="532" y="88" width="174" height="144" rx="10" fill="var(--vp-c-green-soft, #e7f5ef)" stroke="var(--vp-c-green-2, #58a58d)" stroke-width="1.5" />
     <g text-anchor="middle">
-      <text x="565" y="117" font-size="20" font-weight="600">Probe 调试探针</text>
-      <g transform="translate(565)" text-anchor="start" font-size="14">
+      <text x="619" y="117" font-size="20" font-weight="600">Probe 调试探针</text>
+      <g transform="translate(619)" text-anchor="start" font-size="14">
         <g class="tool-example-block" style="transform-box: fill-box; transform: translateX(-50%);">
           <text x="0" y="141" fill="var(--vp-c-text-2, #525b6b)">示例：</text>
           <g role="list" aria-label="调试探针示例">
@@ -47,26 +48,26 @@
       </g>
     </g>
 
-    <rect x="746" y="88" width="82" height="144" rx="10" fill="var(--vp-c-yellow-soft, #fff3df)" stroke="var(--vp-c-yellow-2, #ba924e)" stroke-width="1.5" />
+    <rect x="800" y="88" width="82" height="144" rx="10" fill="var(--vp-c-yellow-soft, #fff3df)" stroke="var(--vp-c-yellow-2, #ba924e)" stroke-width="1.5" />
     <g text-anchor="middle">
-      <text x="787" y="151" font-size="20" font-weight="600">MCU</text>
-      <text x="787" y="184" font-size="17">STM32</text>
+      <text x="841" y="151" font-size="20" font-weight="600">MCU</text>
+      <text x="841" y="184" font-size="17">STM32</text>
     </g>
 
     <g stroke="var(--vp-c-text-2, #525b6b)" stroke-width="1.8" marker-start="url(#debugging-arrow)" marker-end="url(#debugging-arrow)">
-      <path d="M 148 160 H 214" />
-      <path d="M 378 160 H 468" />
-      <path d="M 662 160 H 736" />
+      <path d="M 148 160 H 230" />
+      <path d="M 420 160 H 522" />
+      <path d="M 716 160 H 790" />
     </g>
     <g text-anchor="middle" fill="var(--vp-c-text-2, #525b6b)">
-      <text x="181" y="144" font-size="12.5">GDB 远程协议</text>
-      <text x="181" y="188" font-size="13.5">本机 TCP</text>
-      <text x="426" y="144" font-size="16">USB</text>
-      <text x="432" y="185" font-size="13.5">
-        <tspan x="432">CMSIS-DAP</tspan>
-        <tspan x="430" dy="20">或其他协议</tspan>
+      <text x="190" y="144" font-size="12.5">GDB 远程协议</text>
+      <text x="190" y="188" font-size="13.5">本机 TCP</text>
+      <text x="468" y="144" font-size="16">USB</text>
+      <text x="486" y="185" font-size="13.5">
+        <tspan x="475">CMSIS-DAP</tspan>
+        <tspan x="475" dy="20">或其他协议</tspan>
       </text>
-      <text x="699" y="144" font-size="14">SWD/JTAG</text>
+      <text x="753" y="144" font-size="14">SWD/JTAG</text>
     </g>
   </g>
 </svg>
