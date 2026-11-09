@@ -2,9 +2,11 @@
 import ToolConnectionDiagram from "./components/ToolConnectionDiagram.vue"
 </script>
 
-# 介绍
+# 总览与介绍
 
-本章介绍 STM32 开发会用到的基本软件和环境。
+本页介绍 STM32 开发会用到的基本软件和环境。
+
+工具的安装、配置指引请见[工具安装、环境配置](install.md)。
 
 ## 1. 模板代码生成
 
@@ -123,6 +125,10 @@ Keil MDK、IAR EWARM 等 IDE 内置了构建系统，使用它们可以直接在
 
 <ToolConnectionDiagram mode="debugging" />
 
+GDB 客户端可以直接在 Shell 中使用，也可以通过 IDE 等图形化界面调用。
+
+<br>
+
 不同的探针产品使用不同的协议，于是所需的上位机（Host）烧录/调试工具也不同：
 
 | 设备／模式                                             | Host ↔ Probe 协议                                                       |
@@ -133,3 +139,16 @@ Keil MDK、IAR EWARM 等 IDE 内置了构建系统，使用它们可以直接在
 | [DAPLink 固件](https://github.com/ARMmbed/DAPLink)探针 | CMSIS-DAP                                                               |
 
 [OpenOCD](https://openocd.org/) 分别适配这些协议，所以 ST-LINK、J-Link 和 CMSIS-DAP 兼容探针它都能控制。
+
+## 常见 IDE 与工程集成方案
+
+一些常见的 IDE 和工程集成方案如下表所示，但本文更推荐手动管理 CMake 项目的方案。
+
+| 工具                                                                                            | 提供了什么                                                                                        | 阅读相关工程时重点看什么                                                                                                 |
+| ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| [Keil MDK / µVision](https://developer.arm.com/Tools%20and%20Software/Keil%20MDK)               | MDK 开发套件包括编译工具、库和开发环境；经典 µVision 集成编辑、工程管理与调试                     | `.uvprojx` 等工程配置、选用的 Arm 编译器版本、器件支持包与调试设置                                                       |
+| [IAR Embedded Workbench](https://www.iar.com/embedded-development-tools/iar-embedded-workbench) | 集成编译器、汇编器、链接器和 C-SPY 调试器等工具                                                   | `.ewp` 等工程文件、IAR 编译器与库、链接配置和调试设置                                                                    |
+| [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html)                       | ST 的集成开发环境，提供编辑、构建与调试入口                                                       | 使用 Eclipse 版还是 VS Code 版，以及工程实际选择的工具链与构建方式                                                       |
+| [EIDE](https://em-ide.com/docs/intro/)                                                          | 一个易用的 VS Code 的嵌入式工程扩展，管理工程并调用外部编译、烧录工具。提供一定的工具便捷安装功能 | EIDE 工程配置、编译器路径、构建与烧录器选择；调试由 [Cortex-Debug](https://github.com/Marus/cortex-debug) 等扩展配合提供 |
+
+如果要追求易用性、简洁性，推荐使用 EIDE 方案。

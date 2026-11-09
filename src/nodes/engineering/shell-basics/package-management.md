@@ -207,7 +207,7 @@ winget uninstall --id BurntSushi.ripgrep.MSVC
 winget list --upgrade-available
 ```
 
-```bash [macOS、Linux / Homebrew]
+```bash [macOS, Linux / Homebrew]
 # 搜索 ripgrep 相关的包
 brew search ripgrep
 
