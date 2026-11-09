@@ -1,60 +1,135 @@
-# STM32 工具链与开发环境
+<script setup lang="ts">
+import ToolConnectionDiagram from "./components/ToolConnectionDiagram.vue"
+</script>
 
-本节点准备 STM32 开发会用到的软件，分清编译、构建、烧录与调试的职责。完成后，应能查询两套编译工具链的路径和版本，用经典 STM32CubeMX 打开示例配置，并通过 OpenOCD、探针和 SWD 识别目标芯片。
+# 介绍
 
-完整工程的生成、编译、烧录和断点调试留到后续实操。本节点先确认工具和连接可用。
+本章介绍 STM32 开发会用到的基本软件和环境。
 
-## 团队工具清单
+## 1. 模板代码生成
 
-| 用途               | 采用的工具                        | 获取途径与选择                                                                                                    |
-| ------------------ | --------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| 芯片配置与工程生成 | STM32CubeMX（经典版）             | 从 [STM32CubeMX 产品页](https://www.st.com.cn/zh/development-tools/stm32cubemx.html)获取，选择 STM32CubeMX 下载项 |
-| 交叉编译           | GNU Tools for STM32、ST Arm Clang | 从 [STM32CubeCLT 产品页](https://www.st.com.cn/zh/development-tools/stm32cubeclt.html)获取                        |
-| 构建配置与生成     | CMake                             | 独立安装和维护版本                                                                                                |
-| 执行构建规则       | GNU Make 或 Ninja                 | 独立安装和维护版本，按工程配置选择                                                                                |
-| 烧录与调试服务     | OpenOCD                           | 使用与项目配置配套的稳定版程序及脚本                                                                              |
-| 调试客户端         | `arm-none-eabi-gdb`               | 使用 CubeCLT 中 GNU 工具链附带的版本                                                                              |
-| 硬件连接           | CMSIS-DAP、ST-LINK 或 J-Link 探针 | 按实际探针选择示例中的对应配置，经 SWD 连接 STM32                                                                 |
+嵌入式工程涉及到许多底层芯片、外设配置，这部分代码一般复杂繁琐、容易出错，所以通常使用一些图形化软件来生成模板代码（当然也并非不能完全自己手写）。
 
-GNU 与 ST Arm Clang 是两套编译工具链；CMake 配合 Make 或 Ninja 管理构建。它们的职责不同，不能用“安装了 CMake”代替“已经准备好编译器”。CMake、Make、Ninja 的原理与用法见[构建系统](../../c-cpp-engineering/build-systems/intro.md)，这里仅补充 STM32 工具的准备。
+ST 官方为 STM32 系列芯片提供了 [STM32CubeMX](https://www.st.com/zh/development-tools/stm32cubemx.html) 工具，支持图形化配置芯片、外设和中间件，生成初始化代码和工程文件。
 
-## 工具如何配合
+## 2. 编译工具链
 
-从工程配置到芯片运行，大致经过以下环节：
+STM32 是基于 Arm Cortex-M 内核的系列微控制器，需要支持 Arm 架构的交叉编译工具链。
 
-| 环节         | 谁完成                       | 输入与结果                                                        |
-| ------------ | ---------------------------- | ----------------------------------------------------------------- |
-| 生成工程     | CubeMX                       | 根据 `.ioc` 中的芯片配置，生成初始化代码和工程文件                |
-| 准备构建规则 | CMake                        | 读取工程描述、工具链文件和构建配置，生成 Make 或 Ninja 使用的规则 |
-| 构建固件     | Make 或 Ninja 调用编译工具链 | 编译、汇编、链接源码，得到 ELF 等产物                             |
-| 烧录固件     | OpenOCD、探针                | 按固件的装载地址，将程序内容写入芯片的 Flash                      |
-| 调试程序     | GDB、OpenOCD、探针           | 控制目标暂停或继续，观察寄存器、内存和源码位置                    |
+国内嵌入式教学一般使用盗版的旧 Keil MDK 作为 IDE，其使用的 AC5 工具链十分老旧，C 标准支持有限，且不再更新。我们推荐使用开源的 GNU Tools for STM32 或 ST Arm Clang 工具链，这二者也被 STM32CubeMX 支持。
 
-CubeCLT 是分发这些工具中一部分的合集；IDE 是把编辑、构建和调试入口集成起来的开发环境。使用哪种编辑器，不改变这条链路中各工具的职责。
+以下是一些常见的工具链：
 
-## 配套示例：Demo-RM-C
+### Arm GNU Toolchain
 
-本节点使用 [Demo-RM-C 仓库](https://github.com/trident-rm/Demo-RM-C)，文件说明核对到版本 [`483fab4`](https://github.com/trident-rm/Demo-RM-C/tree/483fab4e121a3cb5b7c6c867825a769be65c7397)。可以[下载该版本的 ZIP](https://github.com/trident-rm/Demo-RM-C/archive/483fab4e121a3cb5b7c6c867825a769be65c7397.zip)并解压；后文的“项目根目录”指包含 `Demo-RM-C.ioc`、`CMakeLists.txt` 和 `openocd/` 的目录。
+Arm GNU Toolchain 是 Arm 集成、验证并发布的 GNU 工具链，统一了原 GNU Arm Embedded Toolchain 和面向 A-profile 的发行线。
 
-| 文件或目录                      | 在本节点中的用途                             |
-| ------------------------------- | -------------------------------------------- |
-| `Demo-RM-C.ioc`                 | 用 CubeMX 打开，确认目标芯片为 STM32F407IGH6 |
-| `cmake/gcc-arm-none-eabi.cmake` | 识别 GNU 编译器、辅助工具及目标参数          |
-| `cmake/starm-clang.cmake`       | 对照 ST Arm Clang 的入口与运行库配置         |
-| `CMakePresets.json`             | 确认工程实际选择的工具链、生成器和构建目录   |
-| `openocd/`                      | 按实际探针选择连接与芯片配置                 |
-| `.clangd`                       | 观察编辑器语言服务如何寻找工程的编译参数     |
+- [Arm 官方介绍](https://developer.arm.com/Tools%20and%20Software/GNU%20Toolchain)
+- 免费开源、社区支持，适合跨厂商 Arm MCU 开发；STM32 使用 `arm-none-eabi` 裸机版本。
+- 编译入口：`arm-none-eabi-gcc`、`arm-none-eabi-g++`
+- GNU Binutils 提供汇编器 `arm-none-eabi-as`、链接器 `arm-none-eabi-ld` 等工具
+- 链接脚本：[GNU ld 语法](https://sourceware.org/binutils/docs/ld/Scripts.html)（`.ld`）
+- 目标库：Newlib（C 标准库）、Newlib-nano（精简版）、libstdc++（C++ 标准库）、libgcc
+- 配套调试客户端：`arm-none-eabi-gdb`
 
-该版本的预设使用 **GNU + Ninja**；仓库中同时保留 ST Arm Clang 工具链文件，并不表示已有两套可直接切换的预设。Make 和 Ninja 都可以用于这类构建，具体工程要有相应配置。
+`none` 指裸机、无操作系统；`eabi` 指 Embedded ABI（嵌入式应用二进制接口）。
 
-## 阅读顺序与完成判据
+### GNU Tools for STM32
 
-| 顺序 | 页面                                   | 完成后应能确认                                                     |
-| ---- | -------------------------------------- | ------------------------------------------------------------------ |
-| 1    | [编译工具链与 CubeCLT](./compilers.md) | GNU 与 ST Arm Clang 的命令来自预期目录，版本可查，配套组件保留完整 |
-| 2    | [STM32CubeMX](./cubemx.md)             | 经典 CubeMX 能启动，并打开示例的 `.ioc`                            |
-| 3    | [烧录与 OpenOCD](./flashing.md)        | 说清烧录改变了什么，并接探针识别目标芯片                           |
-| 4    | [调试工具如何配合](./debugging.md)     | GDB 能启动，能说明客户端、调试服务和探针的分工                     |
-| 5    | [编辑器与其他工具](./other-tools.md)   | 能判断编辑器扩展、经典 IDE 和其他工具接管了哪些环节                |
+GNU Tools for STM32 是 ST 维护的 GNU 工具链发行版，基于 Arm GNU Toolchain 的源码构建，并加入面向嵌入式开发和 STM32 工具集成的补丁。
 
-软件部分覆盖 Windows 原生环境、Linux 和 macOS。接板自检还需要实际板卡、探针及其接线文档；电脑能识别 USB 探针，只完成了硬件链路的一部分。
+- [ST 官方源码仓库](https://github.com/STMicroelectronics/gnu-tools-for-stm32)
+- 核心组件开源，常用于 STM32CubeIDE 和 STM32CubeCLT 配套的工程。
+- 编译入口：`arm-none-eabi-gcc`、`arm-none-eabi-g++`
+- GNU Binutils 提供汇编器 `arm-none-eabi-as`、链接器 `arm-none-eabi-ld` 等工具
+- 链接脚本：[GNU ld 语法](https://sourceware.org/binutils/docs/ld/Scripts.html)（`.ld`）
+- 目标库：Newlib（C 标准库）、Newlib-nano（精简版）、libstdc++（C++ 标准库）、libgcc
+- 配套调试客户端：`arm-none-eabi-gdb`
+
+### ST Arm Clang
+
+ST Arm Clang 是 ST 基于开源 LLVM / Clang 和 Arm Toolchain for Embedded 制作的 STM32 工具链，提供 Hybrid 和 Full LLVM 两种组合。
+
+- [ST Arm Clang 官方说明](https://dev.st.com/stm32cube-docs/stm32cubeide-vscode/latest/en/docs/markup/basic_concepts/starm-clang.html)
+- 可随 STM32CubeCLT 免费获取，用于 STM32 的 Clang 编译及 GNU 工程迁移。
+- 编译入口：`starm-clang`、`starm-clang++`，内置汇编器
+- Hybrid：使用 GNU `ld`、Newlib / Newlib-nano、libstdc++、libgcc，需同时安装 GNU 工具链。
+- Full LLVM：使用 `starm-lld`、LLVM 运行时、libc++，C 库可选 Newlib 或 Picolibc。
+- 链接脚本：Hybrid 用 GNU ld 语法；Full LLVM 用 [LLD 的 GNU 风格语法](https://lld.llvm.org/ELF/linker_script.html)，均常用 `.ld`，但两者存在兼容性差异。
+- 链接时优化（LTO）：仅 Full LLVM 组合支持。
+
+### Arm Toolchain for Embedded（ATfE）
+
+Arm Toolchain for Embedded 是 Arm 发布的新一代 LLVM 嵌入式工具链，承接 LLVM Embedded Toolchain for Arm 项目。
+
+- [Arm 官方介绍](https://developer.arm.com/Tools%20and%20Software/Arm%20Toolchain%20for%20Embedded)、[源码与组件说明](https://github.com/arm/arm-toolchain/blob/arm-software/arm-software/embedded/README.md)
+- 面向 Arm 裸机开发；社区版免费开源，Professional 版提供 Arm 商业支持。
+- 编译入口：`clang`、`clang++`，内置汇编器
+- 链接器：LLD；辅助工具来自 LLVM。
+- 链接脚本：[LLD 的 GNU ld 风格语法](https://lld.llvm.org/ELF/linker_script.html)（`.ld`），与 GNU ld 存在兼容性差异。
+- 目标库：Picolibc / LLVM libc 等 C 库、libc++（C++ 标准库）、compiler-rt（运行时）；具体组合依发行版与配置而定。
+
+### Arm Compiler 5（AC5）
+
+Arm Compiler 5 是 Arm 的旧一代编译工具链，承接早期 RealView Compilation Tools（RVCT）工具体系。
+
+- [AC5 用户手册](https://www.keil.com/support/man/docs/armcc/default.htm)
+- 商业专有工具链，常见于旧 Keil MDK 工程。
+- 编译入口：`armcc`
+- 汇编器：`armasm`；链接器：`armlink`
+- 链接脚本：[Arm 散布文件](https://www.keil.com/support/man/docs/uv4/uv4_dg_adsld.asp)（scatter file，`.sct`）
+- 目标库：Arm C/C++ 库，C 库可选 Microlib（精简版）
+- 辅助工具：`armar`（静态库管理）、`fromelf`（映像查看与转换）
+
+### Arm Compiler 6（AC6）
+
+Arm Compiler 6 用基于 LLVM / Clang 的 `armclang` 接替 AC5 的 `armcc`，后来称 Arm Compiler for Embedded。
+
+- [Arm 官方迁移指南](https://documentation-service.arm.com/static/6526b901865a6e5928044f86)
+- 基于开源编译器技术的商业工具链，常用于 Keil MDK 和 Arm Development Studio；链接器和库仍含专有组件。
+- 编译入口：`armclang`，内置汇编器
+- 链接器：`armlink`
+- 链接脚本：沿用 AC5 的 [Arm 散布文件](https://www.keil.com/support/man/docs/uv4/uv4_dg_adsld.asp)（`.sct`）
+- 目标库：Arm C/C++ 库，C 库可选 Microlib（精简版）
+- 从 AC5 迁移时，需核对编译选项、语言扩展和内嵌汇编的差异。
+
+### IAR Arm 工具链
+
+IAR Arm 工具链由 IAR 开发，随 IAR Embedded Workbench for Arm（EWARM）或独立的 IAR Build Tools 提供。
+
+- [IAR 工具总览](https://docs.iar.com/ewarm/10.1x/en/iar-c-c---development/introduction-to-the-iar-build-tools/the-iar-build-tools-an-overview.html)
+- 商业授权，常用于 IAR 工程及需要厂商支持的产品开发。
+- 编译入口：`iccarm`
+- 汇编器：`iasmarm`；链接器：`ilinkarm`
+- 链接脚本：[ILINK 链接配置文件](https://docs.iar.com/ewarm/10.1x/en/iar-c-c---development/the-linker-configuration-file/overview-of-the-linker-configuration-file.html)（`.icf`）
+- 目标库与运行时：DLIB
+- 配套调试器：C-SPY（随 EWARM 提供）
+
+## 3. 构建系统
+
+Keil MDK、IAR EWARM 等 IDE 内置了构建系统，使用它们可以直接在 IDE 中完成编译、链接和烧录，但它们绑定 IDE 和工具链。
+
+我们推荐使用 CMake 配合 Ninja 管理构建，它现代化、兼容性更好、自定义程度高、可移植性更强。
+
+## 4. 烧录与调试
+
+嵌入式项目构建得到的 ELF、BIN 或 HEX 文件可供烧录工具读取，将程序写入 STM32 的 Flash。下面展示通过**调试探针**连接的常见方式，Host（主机）指运行开发工具的电脑。
+
+**烧录工具**控制探针完成擦除、写入与校验：
+
+<ToolConnectionDiagram mode="flashing" />
+
+**调试客户端**提供断点、单步和变量查看等功能；**调试服务器**接收请求，并通过探针访问目标：
+
+<ToolConnectionDiagram mode="debugging" />
+
+不同的探针产品使用不同的协议，于是所需的上位机（Host）烧录/调试工具也不同：
+
+| 设备／模式                                             | Host ↔ Probe 协议                                                       |
+| ------------------------------------------------------ | ----------------------------------------------------------------------- |
+| ST-LINK，运行官方固件                                  | ST-LINK 专用协议                                                        |
+| J-Link，默认模式                                       | J-Link 专用协议                                                         |
+| 支持 CMSIS-DAP 模式的 J-Link，切换后                   | [CMSIS-DAP](https://arm-software.github.io/CMSIS-DAP/latest/index.html) |
+| [DAPLink 固件](https://github.com/ARMmbed/DAPLink)探针 | CMSIS-DAP                                                               |
+
+[OpenOCD](https://openocd.org/) 分别适配这些协议，所以 ST-LINK、J-Link 和 CMSIS-DAP 兼容探针它都能控制。
