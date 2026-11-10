@@ -8,6 +8,7 @@ export default {
   prerequisites: ["c-cpp-engineering.build-systems"],
   parts: [
     { title: "总览与介绍", path: "intro.md" },
-    { title: "工具安装、环境配置", path: "install.md" }
+    { title: "工具安装、环境配置", path: "install.md" },
+    { title: "VS Code 开发环境（示例）", path: "vscode.md" }
   ]
 } satisfies NodeDefinition
