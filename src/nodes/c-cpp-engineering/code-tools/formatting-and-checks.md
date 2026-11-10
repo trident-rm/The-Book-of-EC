@@ -79,12 +79,12 @@ Checks: >
   -modernize-use-trailing-return-type,
   -modernize-use-auto,
   -portability-avoid-pragma-once,
-WarningsAsErrors: ''
-HeaderFilterRegex: '.*/(bsp|shared|robots|tests)/.*'
+WarningsAsErrors: ""
+HeaderFilterRegex: ".*/(bsp|shared|robots|tests)/.*"
 ExcludeHeaderFilterRegex: '.*/(shared/(math|algorithm)|bsp/src/(boards/[^/]+/\.\./\.\./)?hal/h7/usb)/.*'
 FormatStyle: file
 CheckOptions:
-  misc-include-cleaner.IgnoreHeaders: 'external/.*;sys/.*'
+  misc-include-cleaner.IgnoreHeaders: "external/.*;sys/.*"
   readability-identifier-naming.AbstractClassCase: CamelCase
   readability-identifier-naming.ClassCase: CamelCase
 ```
