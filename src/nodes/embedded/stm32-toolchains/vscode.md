@@ -25,6 +25,8 @@ EIDE 在 Windows 中还支持安装常用工具链，包括 `arm-none-eabi-gcc`�
 
 EIDE 可和 [clangd](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-clangd)、[Microsoft C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)、[Cortex-Debug](https://marketplace.visualstudio.com/items?itemName=marus25.cortex-debug) 等扩展配合使用，它能自动提供这些扩展所需项目配置，故通常无需手动编写。
 
+EIDE 使用放在项目根目录的 `.eide/` 目录和 `.code-workspace` 文件保存工程配置。后者同时也是 VS Code 的工作区配置文件，EIDE 项目都应通过该文件打开。
+
 #### 扩展：
 
 - [EIDE](https://em-ide.com/)：嵌入式工程管理、构建和调试入口。
@@ -37,6 +39,16 @@ EIDE 可和 [clangd](https://marketplace.visualstudio.com/items?itemName=llvm-vs
 由于 EIDE 使用自身的构建系统，而不是 CMake 或 Makefile 等通用工具，故需自行在 EIDE 中配置编译器、构建和烧录工具、编译指令等。
 
 推荐让 CubeMX 生成 Makefile 工程，然后将其生成的 Makefile 文件加入 `.gitignore`，再改在 EIDE 中进行实际的构建配置。
+
+::: info 为什么？
+
+本方案只维护 EIDE 的构建配置。若同时维护 CubeMX 生成的另一套构建配置，新增源文件、修改宏定义或编译选项时就需要同步修改两处，容易遗漏并产生不一致。
+
+选择 Makefile 工程，是因为它的构建描述集中在一个 `Makefile` 文件中；相比之下，[CubeMX 生成的 CMake 工程](https://dev.st.com/stm32cube-docs/stm32cubeide-vscode/latest/en/docs/markup/basic_concepts/cmake.html#stm32cubemx-generated-files)还包含 `cmake/`、`CMakeLists.txt`、`CMakePresets.json` 等文件和目录。前者更便于单独加入 `.gitignore`，避免未使用的构建配置被误认为项目的构建入口，也减少 CubeMX 重新生成时带来的无关版本变更。
+
+这里忽略的仅是未使用的构建配置；源码、启动文件、链接脚本以及 EIDE 的工程配置仍应纳入版本管理。
+
+:::
 
 ## 其他扩展
 
