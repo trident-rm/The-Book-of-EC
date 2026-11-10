@@ -23,11 +23,13 @@ EIDE 是一个 VS Code 的嵌入式工程扩展，提供工程管理、构建和
 
 EIDE 在 Windows 中还支持安装常用工具链，包括 `arm-none-eabi-gcc`、`openocd` 等；但对 Linux 和 macOS 中工具链的安装支持有限，需自行另外安装和配置，其还需自行安装 dotnet SDK（EIDE 依赖 .NET 运行时）。
 
-EIDE 可和 [clangd](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-clangd)、[Microsoft C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)、[Cortex-Debug](https://marketplace.visualstudio.com/items?itemName=marus25.cortex-debug) 等扩展配合使用，它能自动提供这些扩展所需项目配置，故通常无需手动编写。
+EIDE 可和 [clangd](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-clangd)、[Microsoft C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)、[Cortex-Debug](https://marketplace.visualstudio.com/items?itemName=marus25.cortex-debug) 等扩展配合使用，它能自动提供这些扩展所需项目配置，故通常无需手动编写。参考说明：
 
-EIDE 使用放在项目根目录的 `.eide/` 目录和 `.code-workspace` 文件保存工程配置。后者同时也是 VS Code 的工作区配置文件，EIDE 项目都应通过该文件打开。
+- [Microsoft C/C++ 支持](https://em-ide.com/zh-cn/docs/notice/cpptools_cfg)
+- [clangd 支持](https://discuss.em-ide.com/d/1112-clangd/2)
+- [Cortex-Debug 支持](https://em-ide.com/zh-cn/docs/advance/debug_project)
 
-#### 扩展：
+#### 扩展要求：
 
 - [EIDE](https://em-ide.com/)：嵌入式工程管理、构建和调试入口。
 - [clangd](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-clangd) 或 [C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)：提供C/C++ 语言服务。
@@ -49,6 +51,12 @@ EIDE 使用放在项目根目录的 `.eide/` 目录和 `.code-workspace` 文件�
 这里忽略的仅是未使用的构建配置；源码、启动文件、链接脚本以及 EIDE 的工程配置仍应纳入版本管理。
 
 :::
+
+#### 示例项目
+
+[STM32CubeMX + EIDE 工程](https://github.com/trident-rm/Demo-RM-C-EIDE)
+
+EIDE 使用放在项目根目录的 `.eide/` 目录和 `.code-workspace` 文件保存工程配置。后者同时也是 VS Code 的工作区配置文件，EIDE 项目都应通过该文件打开。
 
 ## 其他扩展
 
