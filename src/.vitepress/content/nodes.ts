@@ -2,6 +2,7 @@ import embeddedCircuitBasics from "#nodes/embedded/circuit-basics/meta.ts"
 import embeddedMcuStructure from "#nodes/embedded/mcu-structure/meta.ts"
 import cCppEngineeringToolchain from "#nodes/c-cpp-engineering/c-cpp-toolchain/meta.ts"
 import cCppEngineeringBuildSystems from "#nodes/c-cpp-engineering/build-systems/meta.ts"
+import cCppEngineeringCodeTools from "#nodes/c-cpp-engineering/code-tools/meta.ts"
 import engineeringGitBasics from "#nodes/engineering/git-basics/meta.ts"
 import engineeringGitRemote from "#nodes/engineering/git-remote/meta.ts"
 import engineeringShellBasics from "#nodes/engineering/shell-basics/meta.ts"
@@ -12,6 +13,7 @@ export const nodeIds = [
   "engineering.shell-basics",
   "c-cpp-engineering.c-cpp-toolchain",
   "c-cpp-engineering.build-systems",
+  "c-cpp-engineering.code-tools",
   "engineering.git-basics",
   "engineering.git-remote",
   "embedded.circuit-basics",
@@ -54,6 +56,7 @@ export const nodes = {
   [engineeringShellBasics.id]: engineeringShellBasics,
   [cCppEngineeringToolchain.id]: cCppEngineeringToolchain,
   [cCppEngineeringBuildSystems.id]: cCppEngineeringBuildSystems,
+  [cCppEngineeringCodeTools.id]: cCppEngineeringCodeTools,
   [engineeringGitBasics.id]: engineeringGitBasics,
   [engineeringGitRemote.id]: engineeringGitRemote,
   [embeddedCircuitBasics.id]: embeddedCircuitBasics,
