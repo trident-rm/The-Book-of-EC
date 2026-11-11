@@ -1,4 +1,4 @@
-import type { NodeDefinition } from "#content/nodes.ts";
+import type { NodeDefinition } from "#content/nodes.ts"
 
 export default {
   id: "embedded.emb-c-basics",
@@ -8,6 +8,6 @@ export default {
   parts: [
     { title: "引入", path: "intro.md" },
     { title: "基础篇", path: "basic.md" },
-    { title: "RTOS", path: "rtos.md" },
-  ],
-} satisfies NodeDefinition;
+    { title: "RTOS", path: "rtos.md" }
+  ]
+} satisfies NodeDefinition
