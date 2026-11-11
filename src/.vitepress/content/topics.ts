@@ -28,7 +28,12 @@ export const topics = defineTopics({
   },
   embedded: {
     title: "嵌入式",
-    members: ["embedded.circuit-basics", "embedded.mcu-structure", "embedded.stm32-toolchains"]
+    members: [
+      "embedded.circuit-basics",
+      "embedded.mcu-structure",
+      "embedded.stm32-toolchains",
+      "embedded.c-basics"
+    ]
   }
 })
 

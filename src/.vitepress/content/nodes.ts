@@ -7,6 +7,7 @@ import engineeringGitBasics from "#nodes/engineering/git-basics/meta.ts"
 import engineeringGitRemote from "#nodes/engineering/git-remote/meta.ts"
 import engineeringShellBasics from "#nodes/engineering/shell-basics/meta.ts"
 import embeddedStm32Toolchains from "#nodes/embedded/stm32-toolchains/meta.ts"
+import embeddedCBasics from "#nodes/embedded/c-basics/meta.ts"
 
 /** 全部合法节点 ID。 */
 export const nodeIds = [
@@ -18,7 +19,8 @@ export const nodeIds = [
   "engineering.git-remote",
   "embedded.circuit-basics",
   "embedded.mcu-structure",
-  "embedded.stm32-toolchains"
+  "embedded.stm32-toolchains",
+  "embedded.c-basics"
 ] as const
 
 /** 合法节点 ID。 */
@@ -61,7 +63,8 @@ export const nodes = {
   [engineeringGitRemote.id]: engineeringGitRemote,
   [embeddedCircuitBasics.id]: embeddedCircuitBasics,
   [embeddedMcuStructure.id]: embeddedMcuStructure,
-  [embeddedStm32Toolchains.id]: embeddedStm32Toolchains
+  [embeddedStm32Toolchains.id]: embeddedStm32Toolchains,
+  [embeddedCBasics.id]: embeddedCBasics
 } satisfies Record<NodeId, NodeDefinition>
 
 /** 前端使用的节点数据。 */
