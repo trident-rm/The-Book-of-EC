@@ -2,6 +2,10 @@
 
 本页提供两种示例的 VS Code 开发环境配置方案，它们各自独立。用户则需选择，也可自己修改、组合或扩展。
 
+::: tip
+使用 VS Code 的**配置文件（Profiles）**功能，它可以把帮助你隔离不同的开发环境。每一个 Profile 都可以独立安装扩展、配置设置等，你可以为不同的项目或不同的开发环境创建不同的 Profile，避免扩展和配置冲突。详见 [Profiles in VS Code](https://code.visualstudio.com/docs/configure/profiles)。
+:::
+
 ## 方案一：CMake 工程
 
 该方案针对纯 CMake 工程项目，可定制性强、拓展性高、兼容性好。
