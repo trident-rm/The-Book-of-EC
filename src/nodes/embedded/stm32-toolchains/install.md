@@ -31,7 +31,7 @@ CubeCLT 安装根目录/
 
 #### 操作：
 
-1. 下载 [STM32CubeCLT](https://www.st.com.cn/zh/development-tools/stm32cubeclt.html)，解压到你希望的安装目录。
+1. 下载解压 [STM32CubeCLT](https://www.st.com.cn/zh/development-tools/stm32cubeclt.html)，安装到你希望的目录。
 2. 将其中两个工具链的 `bin` 目录都添加到 `PATH`。
 3. 检查可用性：
 
