@@ -2,7 +2,7 @@ import type { NodeDefinition } from "#content/nodes.ts"
 
 export default {
   id: "embedded.stm32-toolchains",
-  title: "STM32 工具链",
+  title: "STM32 工具链和开发环境",
   summary: "准备 STM32 编译工具链与 CubeMX，理解烧录和调试分工，并用 OpenOCD 识别目标芯片。",
   // hidden: true,
   prerequisites: ["c-cpp-engineering.build-systems"],
