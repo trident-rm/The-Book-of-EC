@@ -7,7 +7,7 @@ import engineeringGitBasics from "#nodes/engineering/git-basics/meta.ts"
 import engineeringGitRemote from "#nodes/engineering/git-remote/meta.ts"
 import engineeringShellBasics from "#nodes/engineering/shell-basics/meta.ts"
 import embeddedStm32Toolchains from "#nodes/embedded/stm32-toolchains/meta.ts"
-import embeddedCBasics from "#nodes/embedded/c-basics/meta.ts"
+import embeddedCBasics from "#nodes/embedded/emb-c-basics/meta.ts"
 
 /** 全部合法节点 ID。 */
 export const nodeIds = [
@@ -20,7 +20,7 @@ export const nodeIds = [
   "embedded.circuit-basics",
   "embedded.mcu-structure",
   "embedded.stm32-toolchains",
-  "embedded.c-basics"
+  "embedded.emb-c-basics"
 ] as const
 
 /** 合法节点 ID。 */

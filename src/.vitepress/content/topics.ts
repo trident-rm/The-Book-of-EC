@@ -32,7 +32,7 @@ export const topics = defineTopics({
       "embedded.circuit-basics",
       "embedded.mcu-structure",
       "embedded.stm32-toolchains",
-      "embedded.c-basics"
+      "embedded.emb-c-basics"
     ]
   }
 })
