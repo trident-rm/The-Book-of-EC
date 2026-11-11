@@ -17,6 +17,7 @@
     "preview": "vitepress preview src"
   },
   "dependencies": {
+    "@lucide/vue": "^1.71.0",
     "cytoscape": "^3.34.4",
     "cytoscape-dagre": "^4.0.1",
     "motion-v": "^2.11.1"

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Focus, Maximize2, Minimize2 } from "@lucide/vue"
 import { withBase } from "vitepress"
 import { VPLink } from "vitepress/theme"
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
@@ -313,15 +314,8 @@ onBeforeUnmount(() => {
     <div class="graph-canvas-wrap">
       <div ref="canvas" class="cy-canvas" role="application" aria-label="可交互学习节点依赖图" />
       <div class="graph-canvas-actions" aria-label="图操作">
-        <button type="button" aria-label="清空搜索" title="清空搜索" @click="clearSearch">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M19 8a8 8 0 1 0 1.5 7M19 4v4h-4" />
-          </svg>
-        </button>
         <button type="button" aria-label="适配视图" title="适配视图" @click="fitGraph">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M8 4H4v4M16 4h4v4M4 16v4h4M20 16v4h-4" />
-          </svg>
+          <Focus aria-hidden="true" />
         </button>
         <button
           type="button"
@@ -330,13 +324,8 @@ onBeforeUnmount(() => {
           :aria-pressed="isExpanded"
           @click="toggleExpanded"
         >
-          <svg v-if="!isExpanded" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M8 4H4v4M16 4h4v4M4 16v4h4M20 16v4h-4" />
-            <path d="M9 9h6v6H9z" />
-          </svg>
-          <svg v-else viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" />
-          </svg>
+          <Maximize2 v-if="!isExpanded" aria-hidden="true" />
+          <Minimize2 v-else aria-hidden="true" />
         </button>
       </div>
     </div>
