@@ -35,7 +35,7 @@
 
     <rect x="532" y="88" width="174" height="144" rx="10" fill="var(--vp-c-green-soft, #e7f5ef)" stroke="var(--vp-c-green-2, #58a58d)" stroke-width="1.5" />
     <g text-anchor="middle">
-      <text x="619" y="117" font-size="20" font-weight="600">Probe 调试探针</text>
+      <text x="619" y="117" font-size="20" font-weight="600">调试探针</text>
       <g transform="translate(619)" text-anchor="start" font-size="14">
         <g class="tool-example-block" style="transform-box: fill-box; transform: translateX(-50%);">
           <text x="0" y="141" fill="var(--vp-c-text-2, #525b6b)">示例：</text>
