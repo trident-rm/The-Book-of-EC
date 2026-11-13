@@ -7,7 +7,6 @@ export default {
   prerequisites: ["embedded.stm32-toolchains"],
   parts: [
     { title: "引入", path: "intro.md" },
-    { title: "基础篇", path: "basic.md" },
-    { title: "RTOS", path: "rtos.md" }
+    { title: "基础篇", path: "basic.md" }
   ]
 } satisfies NodeDefinition

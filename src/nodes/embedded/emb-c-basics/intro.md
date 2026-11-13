@@ -18,9 +18,3 @@ STM32 是 ST 公司的 MCU 产品家族，采用 Cortex-M 内核。它包含多�
 - [STM32L4 系列](https://www.st.com/en/microcontrollers-microprocessors/stm32l4-series.html)：Cortex-M4 内核，侧重低功耗，适用于电池供电的传感器和便携设备。
 
 同一系列内，不同型号提供不同规格的存储容量、外设和引脚配置。
-
----
-
-下面的视频介绍了 STM32 系列 MCU 的一些背景和基本概念：
-
-- [Bilibili - 初识 STM32](https://www.bilibili.com/video/BV1Vt411X7PK/?p=3)
