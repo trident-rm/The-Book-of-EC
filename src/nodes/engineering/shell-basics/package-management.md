@@ -165,25 +165,22 @@ _注：对于上述的某些工具，包管理只是它们的众多功能之一�
 
 ::: code-group
 
-```powershell [Windows / Chocolatey]
+```powershell [Windows / Scoop]
 # 搜索 ripgrep 相关的包
-choco search ripgrep
+scoop search ripgrep
 
 # 安装
-choco install ripgrep
+scoop install ripgrep
 
 # 列出所有安装了的包
-choco list
+scoop list
 
 # 查看已安装的 ripgrep 详情
-choco info ripgrep
+scoop info ripgrep
 
 # 升级和卸载
-choco upgrade ripgrep
-choco uninstall ripgrep
-
-# 列出所有可升级的包
-choco outdated
+scoop update ripgrep
+scoop uninstall ripgrep
 ```
 
 ```powershell [Windows / WinGet]

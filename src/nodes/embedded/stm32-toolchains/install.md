@@ -55,8 +55,8 @@ CubeCLT 安装根目录/
 
 ::: code-group
 
-```powershell [Windows / Chocolatey]
-choco install openocd
+```powershell [Windows / Scoop]
+scoop install openocd
 ```
 
 ```bash [macOS, Linux / Homebrew]
