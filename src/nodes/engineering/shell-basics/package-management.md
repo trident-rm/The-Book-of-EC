@@ -181,6 +181,9 @@ scoop info ripgrep
 # 升级和卸载
 scoop update ripgrep
 scoop uninstall ripgrep
+
+# 列出所有可升级的包
+scoop status
 ```
 
 ```powershell [Windows / WinGet]
